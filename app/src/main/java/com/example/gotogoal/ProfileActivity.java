@@ -20,6 +20,8 @@ public class ProfileActivity extends AppCompatActivity {
         final EditText weightEditText = (EditText) findViewById(R.id.weightEditText);
         final Button changeValBtn = (Button) findViewById(R.id.changeValBtn);
         final Button saveBtn = (Button) findViewById(R.id.saveBtn);
+        final TextView bmiTextView = (TextView) findViewById(R.id.bmiTextView);
+
 
         changeValBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,10 +41,12 @@ public class ProfileActivity extends AppCompatActivity {
                 if(!heightEditText.getText().toString().equals("") && !weightEditText.getText().toString().equals("")) {
                     String newWeight = getProperVal(weightEditText.getText().toString());
                     String newHeight = getProperVal(heightEditText.getText().toString());
+                    String bmi = Double.parseDouble(newWeight)/(Double.parseDouble(newHeight)*Double.parseDouble(newHeight)/10000) + "";
                     weightTextView.setText(newWeight);
                     heightTextView.setText(newHeight);
                     weightEditText.setText(newWeight);
                     heightEditText.setText(newHeight);
+                    bmiTextView.setText(getProperVal(bmi));
                     changeValBtn.setVisibility(View.VISIBLE);
                     weightEditText.setVisibility(View.GONE);
                     heightEditText.setVisibility(View.GONE);
@@ -58,7 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
         String sVal = Double.parseDouble(val)+"";
         for(int i = 0; i < sVal.length(); i++){
             if(sVal.charAt(i) =='.') {
-                if (sVal.charAt(i + 1) == '0' && sVal.length() == i + 2) {
+                if (sVal.charAt(i + 1) == '0' && sVal.length() >= i + 2) {
                     return sVal.substring(0, i);
                 } else {
                     if (sVal.length() > i + 2) {
