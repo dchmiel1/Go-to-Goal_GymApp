@@ -1,31 +1,31 @@
 package com.example.gotogoal;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.os.Build;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String dateString;
-    private Date date;
+    public static Date date;
+    public static DbHelper dbHelper;
+    private String exercises[] = new String[5];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +43,25 @@ public class MainActivity extends AppCompatActivity {
         final TextView emptyTextView = (TextView) findViewById(R.id.emptyTextView);
         date = new Date();
         dateTextView.setText("Today");
+
+        if(dbHelper == null) {
+            System.out.println("Utworzono");
+            dbHelper = new DbHelper(this);
+        }
+        Cursor c = dbHelper.getByDate(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
+        int i = 0;
+        if(c.getCount() == 0){
+            emptyTextView.setText("Workout is empty");
+        }
+        while(c.moveToNext()) {
+            System.out.println("znalazl");
+            exercises[i] = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE));
+            ++i;
+        }
+        dbHelper.showAll();
+
+        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, exercises);
+        layout.setAdapter(workoutAdapter);
 
         profileImageView.setOnClickListener(new View.OnClickListener() {
             @Override

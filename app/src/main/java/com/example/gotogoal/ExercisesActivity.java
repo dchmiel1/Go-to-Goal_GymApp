@@ -2,21 +2,25 @@ package com.example.gotogoal;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class ExercisesActivity extends AppCompatActivity {
 
     String exercises[];
+    private DbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercises);
 
-        ListView listView = (ListView) findViewById(R.id.listView);
+        final ListView listView = (ListView) findViewById(R.id.listView);
         Resources res = getResources();
         int id = getIntent().getExtras().getInt("muscleId");
         switch(id){
@@ -45,8 +49,19 @@ public class ExercisesActivity extends AppCompatActivity {
                 exercises = null;
                 break;
         }
+        dbHelper = MainActivity.dbHelper;
 
         listView.setAdapter(new ArrayAdapter<String>(this, R.layout.exercise_listview, exercises));
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent showMainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
+                dbHelper.insertContact(listView.getItemAtPosition(i).toString());
+                startActivity(showMainActivityIntent);
+
+            }
+        });
 
     }
 }
