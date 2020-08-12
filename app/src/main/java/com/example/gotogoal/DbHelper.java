@@ -39,13 +39,13 @@ public class DbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertContact (String i) {
+    public boolean insertSet (String exName, int reps, double kgAdded) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DbNames.COLUMN_NAME_DATE, new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(MainActivity.date));
-        values.put(DbNames.COLUMN_NAME_EXERCISE, i);
-        values.put(DbNames.COLUMN_NAME_REPS, 10);
-        values.put(DbNames.COLUMN_NAME_KG_ADDED, 10);
+        values.put(DbNames.COLUMN_NAME_EXERCISE, exName);
+        values.put(DbNames.COLUMN_NAME_REPS, reps);
+        values.put(DbNames.COLUMN_NAME_KG_ADDED, kgAdded);
         db.insert(DbNames.TABLE_NAME, null, values);
         return true;
     }
@@ -75,7 +75,7 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteContact (Integer id) {
+    public void deleteSet (Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("sets_table",
                 "_id = ? ",

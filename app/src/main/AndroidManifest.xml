@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ExercisesActivity"></activity>
+        <activity android:name=".RepsAndKgsActivity"
+            android:windowSoftInputMode="adjustPan"></activity>
+        <activity android:name=".ExercisesActivity" />
         <activity android:name=".MusclesActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".MainActivity">

@@ -1,10 +1,8 @@
 package com.example.gotogoal;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
@@ -13,19 +11,17 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     public static Date date;
     public static DbHelper dbHelper;
-    private String exercises[] = new String[5];
+    private TextView emptyTextView;
+    private GridView workoutLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,31 +33,19 @@ public class MainActivity extends AppCompatActivity {
         final TextView dateTextView = (TextView) findViewById(R.id.dateTextView);
         ImageButton rightImageBtn = (ImageButton) findViewById(R.id.rightImageBtn);
         ImageButton leftImageBtn = (ImageButton) findViewById(R.id.leftImageBtn);
-        final GridView layout = (GridView) findViewById(R.id.workoutGridView);
-        final Animation slideLeftOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_out);
-        final Animation slideRightOut = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_right_out);
-        final TextView emptyTextView = (TextView) findViewById(R.id.emptyTextView);
+        workoutLayout = (GridView) findViewById(R.id.workoutGridView);
+        final Animation slideLeftIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_in);
+        final Animation slideRightIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_right_in);
+        emptyTextView = (TextView) findViewById(R.id.emptyTextView);
         date = new Date();
         dateTextView.setText("Today");
 
         if(dbHelper == null) {
-            System.out.println("Utworzono");
             dbHelper = new DbHelper(this);
         }
-        Cursor c = dbHelper.getByDate(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
-        int i = 0;
-        if(c.getCount() == 0){
-            emptyTextView.setText("Workout is empty");
-        }
-        while(c.moveToNext()) {
-            System.out.println("znalazl");
-            exercises[i] = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE));
-            ++i;
-        }
-        dbHelper.showAll();
 
-        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, exercises);
-        layout.setAdapter(workoutAdapter);
+        checkWorkout();
+        dbHelper.showAll();
 
         profileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,20 +66,22 @@ public class MainActivity extends AppCompatActivity {
         rightImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                layout.startAnimation(slideLeftOut);
-                emptyTextView.startAnimation(slideLeftOut);
+                workoutLayout.startAnimation(slideLeftIn);
+                emptyTextView.startAnimation(slideLeftIn);
                 date = new Date(date.getTime() + (1000 * 60 * 60 * 24));
                 setDate(dateTextView);
+                checkWorkout();
             }
         });
 
         leftImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                layout.startAnimation(slideRightOut);
-                emptyTextView.startAnimation(slideRightOut);
+                workoutLayout.startAnimation(slideRightIn);
+                emptyTextView.startAnimation(slideRightIn);
                 date = new Date(date.getTime() - (1000 * 60 * 60 * 24));
                 setDate(dateTextView);
+                checkWorkout();
             }
         });
     }
@@ -124,5 +110,24 @@ public class MainActivity extends AppCompatActivity {
                         dateTextView.setText(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
         }else
             dateTextView.setText(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
+    }
+
+    private void checkWorkout(){
+        Cursor c = dbHelper.getByDate(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
+        int i = 0;
+        int howMany = c.getCount();
+        String[] exercises = new String[howMany];
+        if(howMany == 0){
+            emptyTextView.setText("Workout is empty");
+        }
+        else{
+            emptyTextView.setText("");
+        }
+        while(c.moveToNext()) {
+            exercises[i] = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE));
+            ++i;
+        }
+        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, exercises);
+        workoutLayout.setAdapter(workoutAdapter);
     }
 }

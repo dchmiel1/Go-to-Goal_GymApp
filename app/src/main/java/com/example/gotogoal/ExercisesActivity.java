@@ -12,8 +12,7 @@ import android.widget.ListView;
 
 public class ExercisesActivity extends AppCompatActivity {
 
-    String exercises[];
-    private DbHelper dbHelper;
+    private String exercises[];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,17 +48,15 @@ public class ExercisesActivity extends AppCompatActivity {
                 exercises = null;
                 break;
         }
-        dbHelper = MainActivity.dbHelper;
 
         listView.setAdapter(new ArrayAdapter<String>(this, R.layout.exercise_listview, exercises));
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent showMainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
-                dbHelper.insertContact(listView.getItemAtPosition(i).toString());
-                startActivity(showMainActivityIntent);
-
+                Intent showRepsAndKgsActivity = new Intent(getApplicationContext(), RepsAndKgsActivity.class);
+                showRepsAndKgsActivity.putExtra("ex_name", listView.getItemAtPosition(i).toString());
+                startActivity(showRepsAndKgsActivity);
             }
         });
 
