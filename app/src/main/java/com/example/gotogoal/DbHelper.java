@@ -56,9 +56,23 @@ public class DbHelper extends SQLiteOpenHelper {
         return res;
     }
 
-    public Cursor getByDate(String date){
+    public Cursor getSetsByDate(String date){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery("select * from " + DbNames.TABLE_NAME + " where date =" + "'"+date+"'"+"", null);
+        return c;
+    }
+
+    public Cursor getExercisesByDate(String date){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("select distinct " + DbNames.COLUMN_NAME_EXERCISE + " from " + DbNames.TABLE_NAME + " where date =" + "'" + date + "'" + "", null);
+        return c;
+    }
+
+    public Cursor getSetsByDateAndExercise(String date, String exercise){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_EXERCISE + ", " + DbNames.COLUMN_NAME_REPS + ", " + DbNames.COLUMN_NAME_KG_ADDED +
+                                " from " + DbNames.TABLE_NAME + " " +
+                                "where " + DbNames.COLUMN_NAME_DATE + " =" + "'" + date + "'" + " and " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" + exercise +"'" + "", null);
         return c;
     }
 

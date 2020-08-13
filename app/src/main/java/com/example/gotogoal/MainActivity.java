@@ -1,19 +1,28 @@
 package com.example.gotogoal;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,12 +31,14 @@ public class MainActivity extends AppCompatActivity {
     public static DbHelper dbHelper;
     private TextView emptyTextView;
     private GridView workoutLayout;
+    private LayoutInflater inflater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ImageView profileImageView = (ImageView) findViewById(R.id.profileImageView);
         ImageView addImageView = (ImageView) findViewById(R.id.addImageView);
         final TextView dateTextView = (TextView) findViewById(R.id.dateTextView);
@@ -43,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         if(dbHelper == null) {
             dbHelper = new DbHelper(this);
         }
+
 
         checkWorkout();
         dbHelper.showAll();
@@ -112,22 +124,99 @@ public class MainActivity extends AppCompatActivity {
             dateTextView.setText(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
     }
 
+    public class Structure{
+        public String exercise;
+        public String[] reps;
+        public String[] kgs;
+
+        Structure(){
+
+        }
+    }
+
     private void checkWorkout(){
-        Cursor c = dbHelper.getByDate(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
-        int i = 0;
-        int howMany = c.getCount();
+        String dateString = new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date);
+        Cursor c2 = dbHelper.getExercisesByDate(dateString);
+        int howMany = c2.getCount();
+        Structure[] structures = new Structure[howMany];
+
+        for(int k = 0; k < howMany; k++){
+            structures[k] = new Structure();
+        }
+
         String[] exercises = new String[howMany];
-        if(howMany == 0){
+        if(howMany == 0)
             emptyTextView.setText("Workout is empty");
-        }
-        else{
+        else
             emptyTextView.setText("");
-        }
-        while(c.moveToNext()) {
-            exercises[i] = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE));
+        int i = 0;
+        while(c2.moveToNext()) {
+            exercises[i] = c2.getString(c2.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE));
+            structures[i].exercise = exercises[i];
             ++i;
         }
-        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, exercises);
+
+        for(int j = 0; j < howMany; j++) {
+            Cursor c3 = dbHelper.getSetsByDateAndExercise(dateString, exercises[j]);
+            structures[j].reps = new String[c3.getCount()];
+            structures[j].kgs = new String[c3.getCount()];
+            int k = 0;
+            while (c3.moveToNext()) {
+                structures[j].reps[k] = String.valueOf(c3.getInt(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
+                structures[j].kgs[k] = String.valueOf(c3.getDouble(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+                ++k;
+            }
+        }
+        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, structures);
         workoutLayout.setAdapter(workoutAdapter);
+
+        System.out.println("LOL: " + workoutLayout.getHeight());
+
+
+        /*View v = inflater.inflate(R.layout.workout_gridview, null);
+        ListView[] listViews = new ListView[exercises.length];
+        for(int j = 0; j < exercises.length; j++){
+            listViews[j] = (ListView) v.findViewById(R.id.setsListView);
+        }
+        for(int j = 0; j < exercises.length; j++) {
+            Cursor c3 = dbHelper.getSetsByDateAndExercise(dateString, exercises[j]);
+            String[] reps = new String[c3.getCount()];
+            String[] kgs = new String[c3.getCount()];
+            int k = 0;
+            while(c3.moveToNext()) {
+                reps[k] = String.valueOf(c3.getInt(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
+                kgs[k] = String.valueOf(c3.getDouble(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+                ++k;
+            }
+            listViews[j].setAdapter(new ArrayAdapter<String>(this, R.layout.set_listview, new String[0]));
+            for(int l = 0; l < c3.getCount(); l++){
+                listViews[j].addFooterView(newListViewItem(reps[l], kgs[l]));
+            }
+        }
+        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, exercises, listViews);
+        workoutLayout.setAdapter(workoutAdapter);*/
+    }
+
+    private View newGridViewItem(String exercise, String[] reps, String[] kgs){
+        View v = inflater.inflate(R.layout.workout_gridview, null);
+        TextView exNameTextView = (TextView) v.findViewById(R.id.exNameTextView);
+        ListView setsListView = (ListView) v.findViewById(R.id.setsListView);
+        exNameTextView.setText(exercise);
+        for(int i = 0; i < reps.length; i ++) {
+            setsListView.addFooterView(newListViewItem(reps[i], kgs[i]));
+        }
+
+        return v;
+
+    }
+
+    private View newListViewItem(String reps, String kgs){
+        View v = inflater.inflate(R.layout.exercise_in_workout_listview, null);
+        TextView repsTextView = (TextView) v.findViewById(R.id.repsTextView);
+        TextView kgsTextView = (TextView) v.findViewById(R.id.kgsTextView);
+        repsTextView.setText(reps);
+        kgsTextView.setText(kgs);
+        return v;
+
     }
 }
