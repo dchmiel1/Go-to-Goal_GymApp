@@ -56,12 +56,6 @@ public class DbHelper extends SQLiteOpenHelper {
         return res;
     }
 
-    public Cursor getSetsByDate(String date){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("select * from " + DbNames.TABLE_NAME + " where date =" + "'"+date+"'"+"", null);
-        return c;
-    }
-
     public Cursor getExercisesByDate(String date){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery("select distinct " + DbNames.COLUMN_NAME_EXERCISE + " from " + DbNames.TABLE_NAME + " where date =" + "'" + date + "'" + "", null);
@@ -94,5 +88,37 @@ public class DbHelper extends SQLiteOpenHelper {
         db.delete("sets_table",
                 "_id = ? ",
                 new String[] { Integer.toString(id) });
+    }
+
+    public void insertOrUpdateWeight(double kgs, int cms){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        String date = new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(MainActivity.date);
+        values.put(DbNames.COLUMN_NAME_DATE, date);
+        values.put(DbNames.COLUMN_NAME_EXERCISE, "weight");
+        values.put(DbNames.COLUMN_NAME_REPS, cms);
+        values.put(DbNames.COLUMN_NAME_KG_ADDED, kgs);
+        if(isWeightThatDate(date)) {
+            db.update(DbNames.TABLE_NAME, values,  "date = ? and exercise = 'weight'", new String[]{date});
+        }
+        else{
+            insertSet("weight", cms, kgs);
+        }
+    }
+
+    private boolean isWeightThatDate(String date){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("select * " +
+                                    " from " + DbNames.TABLE_NAME + " " +
+                                    " where " + DbNames.COLUMN_NAME_DATE + " =" + "'" + date + "' and " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight'", null);
+        System.out.println(c.getCount() > 0);
+        return c.getCount() > 0;
+    }
+
+    public Cursor findLastWeight(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_KG_ADDED + ", " + DbNames.COLUMN_NAME_REPS +
+                                " from " + DbNames.TABLE_NAME + " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight' ", null);
+        return c;
     }
 }

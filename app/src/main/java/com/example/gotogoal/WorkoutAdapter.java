@@ -1,7 +1,6 @@
 package com.example.gotogoal;
 
 import android.content.Context;
-import android.system.StructUtsname;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +31,7 @@ public class WorkoutAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return structures[i];
     }
 
     @Override
@@ -42,24 +41,11 @@ public class WorkoutAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        View v = inflater.inflate(R.layout.workout_gridview, null);
-        if(i-2 > -1 && i%2 == 0){
-            System.out.println(i + ":");
-            System.out.println("H1: " + viewGroup.getChildAt(i-2).getHeight());
-            System.out.println("Y1: " + viewGroup.getChildAt(i-2).getY());
-            System.out.println("Y2: " + v.getY());
-            System.out.println(viewGroup.getChildAt(i-2).getY() + viewGroup.getChildAt(i-2).getHeight());
-            int height = 0;
-            int k = 0;
-            v.setY(viewGroup.getChildAt(i-2).getHeight() - viewGroup.getChildAt(i-1).getHeight()+ viewGroup.getChildAt(i-2).getY() - viewGroup.getChildAt(i-1).getY());
-
-
-        }
-
+        View v = inflater.inflate(R.layout.workout_listview, null);
 
         TextView exNameTextView = (TextView) v.findViewById(R.id.exNameTextView);
         ListView listView = (ListView) v.findViewById(R.id.setsListView);
-        RelativeLayout.LayoutParams mParam = new RelativeLayout.LayoutParams((int)(520),(int)(210 + 5 + 5 + structures[i].reps.length * 75));
+        RelativeLayout.LayoutParams mParam = new RelativeLayout.LayoutParams((int)(1000),(int)(150 + 3 + 3 + structures[i].reps.length * 127));
         v.setLayoutParams(mParam);
         listView.setAdapter(new ArrayAdapter<String>(c, R.layout.exercise_in_workout_listview, new String[0]));
         for(int j = 0; j < structures[i].reps.length; j ++){
@@ -73,10 +59,9 @@ public class WorkoutAdapter extends BaseAdapter {
         View v = inflater.inflate(R.layout.exercise_in_workout_listview, null);
         TextView repsTextView = (TextView) v.findViewById(R.id.repsTextView);
         TextView kgsTextView = (TextView) v.findViewById(R.id.kgsTextView);
-        repsTextView.setText(reps);
-        kgsTextView.setText(kgs);
+        repsTextView.setText(ProfileActivity.getProperVal(reps));
+        kgsTextView.setText(ProfileActivity.getProperVal(kgs));
         return v;
-
     }
 
 
