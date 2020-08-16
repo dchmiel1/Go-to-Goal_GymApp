@@ -58,7 +58,10 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public Cursor getExercisesByDate(String date){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("select distinct " + DbNames.COLUMN_NAME_EXERCISE + " from " + DbNames.TABLE_NAME + " where date =" + "'" + date + "'" + "", null);
+        Cursor c = db.rawQuery("select distinct " + DbNames.COLUMN_NAME_EXERCISE +
+                                    " from " + DbNames.TABLE_NAME +
+                                    " where date =" + "'" + date + "'" + " and " + DbNames.COLUMN_NAME_EXERCISE + " != 'weight'"
+                                    , null);
         return c;
     }
 

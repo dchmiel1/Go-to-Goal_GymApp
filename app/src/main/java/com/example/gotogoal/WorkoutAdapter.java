@@ -45,7 +45,7 @@ public class WorkoutAdapter extends BaseAdapter {
 
         TextView exNameTextView = (TextView) v.findViewById(R.id.exNameTextView);
         ListView listView = (ListView) v.findViewById(R.id.setsListView);
-        RelativeLayout.LayoutParams mParam = new RelativeLayout.LayoutParams((int)(1000),(int)(150 + 3 + 3 + structures[i].reps.length * 127));
+        RelativeLayout.LayoutParams mParam = new RelativeLayout.LayoutParams((int)(975),(int)(148 + 3 + 3 + structures[i].reps.length * 126));
         v.setLayoutParams(mParam);
         listView.setAdapter(new ArrayAdapter<String>(c, R.layout.exercise_in_workout_listview, new String[0]));
         for(int j = 0; j < structures[i].reps.length; j ++){

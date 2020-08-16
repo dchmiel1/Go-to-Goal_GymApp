@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ImageView profileImageView = (ImageView) findViewById(R.id.profileImageView);
         ImageView addImageView = (ImageView) findViewById(R.id.addImageView);
+        ImageView achievementsImageView = (ImageView) findViewById(R.id.achievementsImageView);
         final TextView dateTextView = (TextView) findViewById(R.id.dateTextView);
         ImageButton rightImageBtn = (ImageButton) findViewById(R.id.rightImageBtn);
         ImageButton leftImageBtn = (ImageButton) findViewById(R.id.leftImageBtn);
@@ -54,6 +55,14 @@ public class MainActivity extends AppCompatActivity {
 
         checkWorkout();
         dbHelper.showAll();
+
+        achievementsImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent showAchievementsIntent = new Intent(getApplicationContext(), AchievementsActivity.class);
+                startActivity(showAchievementsIntent);
+            }
+        });
 
         profileImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
         public String exercise;
         public String[] reps;
         public String[] kgs;
-
         Structure(){
 
         }

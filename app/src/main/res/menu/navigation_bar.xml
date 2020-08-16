@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <item
+            android:id="@+id/done"
+            android:enabled="true"
+            android:title="Done"/>
+        <item
+            android:id="@+id/last"
+            android:enabled="true"
+            android:title="Last training calculated"/>
+        <item
+            android:id="@+id/best"
+            android:enabled="true"
+            android:title="Best calculated"/>
+</menu>
