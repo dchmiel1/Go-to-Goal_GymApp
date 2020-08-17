@@ -19,7 +19,6 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         dbHelper = MainActivity.dbHelper;
-
         final TextView weightTextView = (TextView) findViewById(R.id.weightTextView);
         final TextView heightTextView = (TextView) findViewById(R.id.heightTextView);
         final EditText heightEditText = (EditText) findViewById(R.id.heightEditText);
@@ -40,38 +39,32 @@ public class ProfileActivity extends AppCompatActivity {
             bmiTextView.setText(getProperVal(String.valueOf(Double.parseDouble(weight)/(Double.parseDouble(height)*Double.parseDouble(height)/10000))));
         }
 
-        changeValBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeValBtn.setVisibility(View.GONE);
-                weightEditText.setVisibility(View.VISIBLE);
-                heightEditText.setVisibility(View.VISIBLE);
-                weightTextView.setVisibility(View.GONE);
-                heightTextView.setVisibility(View.GONE);
-                saveBtn.setVisibility(View.VISIBLE);
-            }
+        changeValBtn.setOnClickListener(view -> {
+            changeValBtn.setVisibility(View.GONE);
+            weightEditText.setVisibility(View.VISIBLE);
+            heightEditText.setVisibility(View.VISIBLE);
+            weightTextView.setVisibility(View.GONE);
+            heightTextView.setVisibility(View.GONE);
+            saveBtn.setVisibility(View.VISIBLE);
         });
 
-        saveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!heightEditText.getText().toString().equals("") && !weightEditText.getText().toString().equals("")) {
-                    String newWeight = getProperVal(weightEditText.getText().toString());
-                    String newHeight = getProperVal(heightEditText.getText().toString());
-                    dbHelper.insertOrUpdateWeight(Double.parseDouble(newWeight), Integer.parseInt(newHeight));
-                    String bmi = Double.parseDouble(newWeight)/(Double.parseDouble(newHeight)*Double.parseDouble(newHeight)/10000) + "";
-                    weightTextView.setText(newWeight);
-                    heightTextView.setText(newHeight);
-                    weightEditText.setText(newWeight);
-                    heightEditText.setText(newHeight);
-                    bmiTextView.setText(getProperVal(bmi));
-                    changeValBtn.setVisibility(View.VISIBLE);
-                    weightEditText.setVisibility(View.GONE);
-                    heightEditText.setVisibility(View.GONE);
-                    weightTextView.setVisibility(View.VISIBLE);
-                    heightTextView.setVisibility(View.VISIBLE);
-                    saveBtn.setVisibility(View.GONE);
-                }
+        saveBtn.setOnClickListener(view -> {
+            if(!heightEditText.getText().toString().equals("") && !weightEditText.getText().toString().equals("")) {
+                String newWeight = getProperVal(weightEditText.getText().toString());
+                String newHeight = getProperVal(heightEditText.getText().toString());
+                dbHelper.insertOrUpdateWeight(Double.parseDouble(newWeight), Integer.parseInt(newHeight));
+                String bmi = Double.parseDouble(newWeight)/(Double.parseDouble(newHeight)*Double.parseDouble(newHeight)/10000) + "";
+                weightTextView.setText(newWeight);
+                heightTextView.setText(newHeight);
+                weightEditText.setText(newWeight);
+                heightEditText.setText(newHeight);
+                bmiTextView.setText(getProperVal(bmi));
+                changeValBtn.setVisibility(View.VISIBLE);
+                weightEditText.setVisibility(View.GONE);
+                heightEditText.setVisibility(View.GONE);
+                weightTextView.setVisibility(View.VISIBLE);
+                heightTextView.setVisibility(View.VISIBLE);
+                saveBtn.setVisibility(View.GONE);
             }
         });
     }

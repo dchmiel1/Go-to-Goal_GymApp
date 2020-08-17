@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class DbHelper extends SQLiteOpenHelper {
@@ -42,7 +43,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public boolean insertSet (String exName, int reps, double kgAdded) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(DbNames.COLUMN_NAME_DATE, new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(MainActivity.date));
+        values.put(DbNames.COLUMN_NAME_DATE, new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(MainActivity.date));
         values.put(DbNames.COLUMN_NAME_EXERCISE, exName);
         values.put(DbNames.COLUMN_NAME_REPS, reps);
         values.put(DbNames.COLUMN_NAME_KG_ADDED, kgAdded);
@@ -105,7 +106,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public void insertOrUpdateWeight(double kgs, int cms){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        String date = new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(MainActivity.date);
+        String date = new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(new Date());
         values.put(DbNames.COLUMN_NAME_DATE, date);
         values.put(DbNames.COLUMN_NAME_EXERCISE, "weight");
         values.put(DbNames.COLUMN_NAME_REPS, cms);
@@ -133,7 +134,7 @@ public class DbHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_KG_ADDED + ", " + DbNames.COLUMN_NAME_REPS +
                                 " from " + DbNames.TABLE_NAME +
                                 " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight' " +
-                                "order by " + DbNames.COLUMN_NAME_DATE, null);
+                                "order by " + DbNames.COLUMN_NAME_DATE + " DESC", null);
         return c;
     }
 
@@ -142,7 +143,7 @@ public class DbHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_KG_ADDED +
                 " from " + DbNames.TABLE_NAME +
                 " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" + exName + "'" + " and " + DbNames.COLUMN_NAME_REPS + " = 1 " +
-                "order by " + DbNames.COLUMN_NAME_DATE, null);
+                "order by " + DbNames.COLUMN_NAME_DATE + " DESC", null);
         if(c.getCount() > 0) {
             c.moveToNext();
             return c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED));
@@ -167,12 +168,11 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public double getCalculatedLastOneRep(String exName){
         SQLiteDatabase db = this.getReadableDatabase();
-        double max = 0;
         String lastDate;
         Cursor dateCursor = db.rawQuery("select " + DbNames.COLUMN_NAME_DATE +
                 " from " + DbNames.TABLE_NAME +
                 " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" + exName + "'" +
-                "order by " + DbNames.COLUMN_NAME_DATE, null);
+                "order by " + DbNames.COLUMN_NAME_DATE + " DESC", null);
         if(dateCursor.getCount() > 0){
             dateCursor.moveToNext();
             lastDate = dateCursor.getString(dateCursor.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE));
@@ -182,7 +182,7 @@ public class DbHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_ONE_REP +
                 " from " + DbNames.TABLE_NAME +
                 " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" +exName+ "'" + " and " + DbNames.COLUMN_NAME_DATE + " = " + "'" +lastDate+ "'" +
-                " order by " + DbNames.COLUMN_NAME_ONE_REP , null);
+                " order by " + DbNames.COLUMN_NAME_ONE_REP + " DESC", null);
         if(c.getCount() > 0) {
             c.moveToNext();
             return c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_ONE_REP));

@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkWorkout(){
-        String dateString = new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date);
+        String dateString = new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(date);
         Cursor c2 = dbHelper.getExercisesByDate(dateString);
         int howMany = c2.getCount();
         Structure[] structures = new Structure[howMany];
