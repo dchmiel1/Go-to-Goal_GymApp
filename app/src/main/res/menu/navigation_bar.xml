@@ -2,15 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
         <item
-            android:id="@+id/done"
+            android:id="@+id/best_done"
             android:enabled="true"
-            android:title="Done"/>
+            android:title="Done last"/>
+
         <item
-            android:id="@+id/last"
+            android:id="@+id/last_done"
             android:enabled="true"
-            android:title="Last training calculated"/>
+            android:title="Done best"/>
         <item
-            android:id="@+id/best"
+            android:id="@+id/last_calculated"
             android:enabled="true"
-            android:title="Best calculated"/>
+            android:title="Last calc."/>
+        <item
+            android:id="@+id/best_calculated"
+            android:enabled="true"
+            android:title="Best calc."/>
 </menu>

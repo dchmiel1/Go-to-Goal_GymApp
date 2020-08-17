@@ -28,12 +28,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView emptyTextView;
     private ListView workoutLayout;
     private LayoutInflater inflater;
+    public static int multiplier[];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        multiplier = getResources().getIntArray(R.array.multipliers);
         inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         ImageView profileImageView = (ImageView) findViewById(R.id.profileImageView);
         ImageView addImageView = (ImageView) findViewById(R.id.addImageView);
@@ -51,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         if(dbHelper == null) {
             dbHelper = new DbHelper(this);
         }
-
 
         checkWorkout();
         dbHelper.showAll();

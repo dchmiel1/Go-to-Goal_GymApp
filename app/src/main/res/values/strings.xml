@@ -1,5 +1,28 @@
 <resources>
     <string name="app_name">GoToGoal</string>
+    <integer-array name="multipliers">
+        <item>0</item>
+        <item>100</item>
+        <item>97</item>
+        <item>94</item>
+        <item>92</item>
+        <item>89</item>
+        <item>86</item>
+        <item>83</item>
+        <item>81</item>
+        <item>78</item>
+        <item>75</item>
+        <item>73</item>
+        <item>71</item>
+        <item>70</item>
+        <item>68</item>
+        <item>67</item>
+        <item>65</item>
+        <item>64</item>
+        <item>63</item>
+        <item>61</item>
+        <item>60</item>
+    </integer-array>
 
     <string-array name="muscles">
         <item>Chest</item>
