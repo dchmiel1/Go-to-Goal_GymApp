@@ -3,6 +3,7 @@ package com.example.gotogoal;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,81 +14,105 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class RepsAndKgsActivity extends AppCompatActivity {
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
-    private int numOfSets = 1;
+public class RepsAndKgsActivity extends AppCompatActivity{
+
+    private int newSets = 1;
     private LayoutInflater inflater;
     private DbHelper dbHelper;
+    private String exName;
+    private ListView setsListView;
+    private int[] idsToUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reps_and_kgs);
 
-        final TextView exNameTextView = ((TextView) findViewById(R.id.exNameTextView));
-        final String exName = getIntent().getExtras().getString("ex_name");
-        exNameTextView.setText(exName);
         Button saveBtn = (Button) findViewById(R.id.saveButton);
-        dbHelper = MainActivity.dbHelper;
+        final TextView exNameTextView = ((TextView) findViewById(R.id.exNameTextView));
 
-        final ListView setsListView = (ListView) findViewById(R.id.setsListView);
+        setsListView = (ListView) findViewById(R.id.setsListView);
+        exName = getIntent().getExtras().getString("ex_name");
+        exNameTextView.setText(exName);
+        dbHelper = MainActivity.dbHelper;
         inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setsListView.setAdapter(new ArrayAdapter<String>(this, R.layout.set_listview, new String[0]));
-        setsListView.addFooterView(newListItem(-1));
 
-        setsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    setVisiblity(view);
-                    setsListView.addFooterView(newListItem(i));
-                    ++numOfSets;
-            }
+        idsToUpdate = display();
+
+        setsListView.setOnItemClickListener((adapterView, view, i, l) -> {
+                setVisiblity(view);
+                setsListView.addFooterView(getNewSetView(i));
+                ++newSets;
         });
 
-        saveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent mainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
-                for(int i = 0; i < numOfSets; i ++){
-                    View v = setsListView.getChildAt(i);
-                    String reps = ((EditText) v.findViewById(R.id.repsEditText)).getText().toString();
-                    String kgs = ((EditText) v.findViewById(R.id.kgsEditText)).getText().toString();
-                    if(!reps.equals("") && !kgs.equals("")){
-                        dbHelper.insertSet(exName, Integer.parseInt(reps), Double.parseDouble(kgs));
-                    }
+        saveBtn.setOnClickListener(view -> {
+            Intent mainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
+
+            for(int i = 0; i < idsToUpdate.length; i ++){
+                View v = setsListView.getChildAt(i);
+                String reps = ((EditText) v.findViewById(R.id.repsEditText)).getText().toString();
+                String kgs = ((EditText) v.findViewById(R.id.kgsEditText)).getText().toString();
+                if(!reps.equals("") && !kgs.equals("")){
+                    dbHelper.updateSet(idsToUpdate[i], Integer.parseInt(reps), Double.parseDouble(kgs), exName);
                 }
-                startActivity(mainActivityIntent);
+                else{
+                    dbHelper.deleteSet(idsToUpdate[i]);
+                }
             }
+            for(int i = idsToUpdate.length; i < idsToUpdate.length + newSets; i ++){
+                View v = setsListView.getChildAt(i);
+                String reps = ((EditText) v.findViewById(R.id.repsEditText)).getText().toString();
+                String kgs = ((EditText) v.findViewById(R.id.kgsEditText)).getText().toString();
+                if(!reps.equals("") && !kgs.equals("")){
+                    dbHelper.insertSet(exName, Integer.parseInt(reps), Double.parseDouble(kgs));
+                }
+            }
+            startActivity(mainActivityIntent);
         });
     }
 
-    private View newListItem(int i){
+    private View getNewSetView(int i){
         View v = inflater.inflate(R.layout.set_listview, null);
-        TextView numOfSetTextView = (TextView) v.findViewById(R.id.numOfSetTextView);
-        EditText repsEditText = (EditText) v.findViewById(R.id.repsEditText);
-        EditText kgsEditText = (EditText) v.findViewById(R.id.kgsEditText);
-        TextView repsTextView = (TextView) v.findViewById(R.id.repsTextView);
-        TextView kgsTextView = (TextView) v.findViewById(R.id.kgsTextView);
-
-        repsEditText.setVisibility(View.GONE);
-        kgsEditText.setVisibility(View.GONE);
-        kgsTextView.setVisibility(View.GONE);
-        repsTextView.setVisibility(View.GONE);
-        numOfSetTextView.setText(i+2+"");
+        ((EditText) v.findViewById(R.id.repsEditText)).setVisibility(View.GONE);
+        ((EditText) v.findViewById(R.id.kgsEditText)).setVisibility(View.GONE);
+        ((TextView) v.findViewById(R.id.repsTextView)).setVisibility(View.GONE);
+        ((TextView) v.findViewById(R.id.kgsTextView)).setVisibility(View.GONE);
+        ((TextView) v.findViewById(R.id.numOfSetTextView)).setText(i+"");
         return v;
     }
 
     private void setVisiblity(View v){
-        EditText repsEditText = (EditText) v.findViewById(R.id.repsEditText);
-        EditText kgsEditText = (EditText) v.findViewById(R.id.kgsEditText);
-        TextView plusTextView = (TextView) v.findViewById(R.id.plus);
-        TextView repsTextView = (TextView) v.findViewById(R.id.repsTextView);
-        TextView kgsTextView = (TextView) v.findViewById(R.id.kgsTextView);
+        ((EditText) v.findViewById(R.id.repsEditText)).setVisibility(View.VISIBLE);
+        ((EditText) v.findViewById(R.id.kgsEditText)).setVisibility(View.VISIBLE);
+        ((TextView) v.findViewById(R.id.plus)).setVisibility(View.GONE);
+        ((TextView) v.findViewById(R.id.repsTextView)).setVisibility(View.VISIBLE);
+        ((TextView) v.findViewById(R.id.kgsTextView)).setVisibility(View.VISIBLE);
+    }
 
-        repsEditText.setVisibility(View.VISIBLE);
-        kgsEditText.setVisibility(View.VISIBLE);
-        kgsTextView.setVisibility(View.VISIBLE);
-        repsTextView.setVisibility(View.VISIBLE);
-        plusTextView.setVisibility(View.GONE);
+    private View getSetView(int i, int reps, double kgs){
+        View v = inflater.inflate(R.layout.set_listview, null);
+        ((TextView) v.findViewById(R.id.numOfSetTextView)).setText(i+"");
+        ((EditText) v.findViewById(R.id.repsEditText)).setText(reps + "");
+        ((EditText) v.findViewById(R.id.kgsEditText)).setText(kgs + "");
+        ((TextView) v.findViewById(R.id.plus)).setVisibility(View.GONE);
+        return v;
+    }
+
+    private int[] display(){
+        int i = 0;
+        int[] ids;
+        Cursor c = dbHelper.getSetsByDateAndExercise(new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(MainActivity.date), exName);
+        ids = new int[c.getCount()];
+        while(c.moveToNext()){
+            ids[i] = c.getInt(c.getColumnIndexOrThrow(DbNames._ID));
+            ++i;
+            setsListView.addFooterView(getSetView(i, c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)), c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))));
+        }
+        setsListView.addFooterView(getNewSetView(i+1));
+        return ids;
     }
 }

@@ -1,16 +1,23 @@
 package com.example.gotogoal;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class WorkoutAdapter extends BaseAdapter {
+import androidx.annotation.RequiresApi;
+
+import java.util.function.Consumer;
+
+public class WorkoutAdapter extends BaseAdapter{
 
     String[]  exercises;
     LayoutInflater inflater;
@@ -39,6 +46,7 @@ public class WorkoutAdapter extends BaseAdapter {
         return 0;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         View v = inflater.inflate(R.layout.workout_listview, null);
@@ -48,9 +56,11 @@ public class WorkoutAdapter extends BaseAdapter {
         RelativeLayout.LayoutParams mParam = new RelativeLayout.LayoutParams((int)(975),(int)(148 + 3 + 3 + structures[i].reps.length * 126));
         v.setLayoutParams(mParam);
         listView.setAdapter(new ArrayAdapter<String>(c, R.layout.exercise_in_workout_listview, new String[0]));
-        for(int j = 0; j < structures[i].reps.length; j ++){
+        exNameTextView.setOnClickListener(view1 -> updateSets(i));
+        listView.setOnItemClickListener((adapterView, view1, i1, l) -> updateSets(i));
+
+        for(int j = 0; j < structures[i].reps.length; j ++)
             listView.addFooterView(newListViewItem(structures[i].reps[j], structures[i].kgs[j]));
-        }
         exNameTextView.setText(structures[i].exercise);
         return v;
     }
@@ -64,5 +74,10 @@ public class WorkoutAdapter extends BaseAdapter {
         return v;
     }
 
-
+    public void updateSets(int i) {
+        Intent showRepsAndKgsActivity = new Intent(c, RepsAndKgsActivity.class);
+        showRepsAndKgsActivity.putExtra("numOfSeriesToUpdate", structures[i].reps.length);
+        showRepsAndKgsActivity.putExtra("ex_name", structures[i].exercise);
+        c.startActivity(showRepsAndKgsActivity);
+    }
 }

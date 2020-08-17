@@ -57,50 +57,35 @@ public class MainActivity extends AppCompatActivity {
         checkWorkout();
         dbHelper.showAll();
 
-        achievementsImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent showAchievementsIntent = new Intent(getApplicationContext(), AchievementsActivity.class);
-                startActivity(showAchievementsIntent);
-            }
+        achievementsImageView.setOnClickListener(view -> {
+            Intent showAchievementsIntent = new Intent(getApplicationContext(), AchievementsActivity.class);
+            startActivity(showAchievementsIntent);
         });
 
-        profileImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent showProfileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
-                startActivity(showProfileIntent);
-            }
+        profileImageView.setOnClickListener(view -> {
+            Intent showProfileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+            startActivity(showProfileIntent);
         });
 
-        addImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent showMusclesIntent = new Intent(getApplicationContext(), MusclesActivity.class);
-                startActivity(showMusclesIntent);
-            }
+        addImageView.setOnClickListener(view -> {
+            Intent showMusclesIntent = new Intent(getApplicationContext(), MusclesActivity.class);
+            startActivity(showMusclesIntent);
         });
 
-        rightImageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                workoutLayout.startAnimation(slideLeftIn);
-                emptyTextView.startAnimation(slideLeftIn);
-                date = new Date(date.getTime() + (1000 * 60 * 60 * 24));
-                setDate(dateTextView);
-                checkWorkout();
-            }
+        rightImageBtn.setOnClickListener(view -> {
+            workoutLayout.startAnimation(slideLeftIn);
+            emptyTextView.startAnimation(slideLeftIn);
+            date = new Date(date.getTime() + (1000 * 60 * 60 * 24));
+            setDate(dateTextView);
+            checkWorkout();
         });
 
-        leftImageBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                workoutLayout.startAnimation(slideRightIn);
-                emptyTextView.startAnimation(slideRightIn);
-                date = new Date(date.getTime() - (1000 * 60 * 60 * 24));
-                setDate(dateTextView);
-                checkWorkout();
-            }
+        leftImageBtn.setOnClickListener(view -> {
+            workoutLayout.startAnimation(slideRightIn);
+            emptyTextView.startAnimation(slideRightIn);
+            date = new Date(date.getTime() - (1000 * 60 * 60 * 24));
+            setDate(dateTextView);
+            checkWorkout();
         });
     }
 

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/exerciseLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/border_dark_blue">
+    android:background="@drawable/border_dark_blue"
+    android:clickable="true"
+    android:focusable="auto">
 
     <TextView
         android:id="@+id/exNameTextView"
@@ -26,5 +29,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="11dp"
         android:layout_marginLeft="11dp"
-        android:layout_marginTop="53dp" />
+        android:layout_marginTop="53dp"
+        android:clickable="false" />
 </RelativeLayout>

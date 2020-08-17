@@ -76,7 +76,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public Cursor getSetsByDateAndExercise(String date, String exercise){
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_EXERCISE + ", " + DbNames.COLUMN_NAME_REPS + ", " + DbNames.COLUMN_NAME_KG_ADDED +
+        Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_EXERCISE + ", " + DbNames.COLUMN_NAME_REPS + ", " + DbNames.COLUMN_NAME_KG_ADDED +", "+ DbNames._ID+
                                 " from " + DbNames.TABLE_NAME + " " +
                                 "where " + DbNames.COLUMN_NAME_DATE + " =" + "'" + date + "'" + " and " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" + exercise +"'" + "", null);
         return c;
@@ -203,5 +203,21 @@ public class DbHelper extends SQLiteOpenHelper {
         }
         else
             return -1;
+    }
+
+    public void updateSet(int id, int reps, double kgs, String exName){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DbNames.COLUMN_NAME_REPS, reps);
+        values.put(DbNames.COLUMN_NAME_KG_ADDED, kgs);
+        if(exName.equals("Pull up") || exName.equals("Dip") && reps <= 20) {
+            Cursor c = findLastWeight();
+            c.moveToNext();
+            values.put(DbNames.COLUMN_NAME_ONE_REP, (kgs +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100));
+        }else if(reps <= 20)
+            values.put(DbNames.COLUMN_NAME_ONE_REP, kgs/((double)MainActivity.multiplier[reps]/100));
+        else
+            values.put(DbNames.COLUMN_NAME_ONE_REP, kgs);
+        db.update(DbNames.TABLE_NAME, values, " _id = ?", new String[]{String.valueOf(id)});
     }
 }
