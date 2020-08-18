@@ -50,7 +50,7 @@ public class DbHelper extends SQLiteOpenHelper {
         if(exName.equals("Pull up") || exName.equals("Dip") && reps <= 20) {
             Cursor c = findLastWeight();
             c.moveToNext();
-            values.put(DbNames.COLUMN_NAME_ONE_REP, (kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100));
+            values.put(DbNames.COLUMN_NAME_ONE_REP, ((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
         }else if(reps <= 20)
             values.put(DbNames.COLUMN_NAME_ONE_REP, kgAdded/((double)MainActivity.multiplier[reps]/100));
         else
@@ -213,7 +213,7 @@ public class DbHelper extends SQLiteOpenHelper {
         if(exName.equals("Pull up") || exName.equals("Dip") && reps <= 20) {
             Cursor c = findLastWeight();
             c.moveToNext();
-            values.put(DbNames.COLUMN_NAME_ONE_REP, (kgs +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100));
+            values.put(DbNames.COLUMN_NAME_ONE_REP, ((kgs +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
         }else if(reps <= 20)
             values.put(DbNames.COLUMN_NAME_ONE_REP, kgs/((double)MainActivity.multiplier[reps]/100));
         else

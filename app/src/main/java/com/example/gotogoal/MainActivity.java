@@ -50,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
         date = new Date();
         dateTextView.setText("Today");
 
+        workoutLayout.setOnItemLongClickListener((adapterView, view, i, l) -> showDelete());
+        workoutLayout.setOnItemClickListener((adapterView, view, i, l) -> updateSets());
+
         if(dbHelper == null) {
             dbHelper = new DbHelper(this);
         }
@@ -159,5 +162,14 @@ public class MainActivity extends AppCompatActivity {
         }
         WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, structures);
         workoutLayout.setAdapter(workoutAdapter);
+    }
+
+    public boolean showDelete(){
+        System.out.println("Clicked from layout");
+        return true;
+    }
+
+    public void updateSets(){
+        System.out.println("Clicked once");
     }
 }

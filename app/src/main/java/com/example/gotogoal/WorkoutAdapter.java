@@ -76,8 +76,12 @@ public class WorkoutAdapter extends BaseAdapter{
 
     public void updateSets(int i) {
         Intent showRepsAndKgsActivity = new Intent(c, RepsAndKgsActivity.class);
-        showRepsAndKgsActivity.putExtra("numOfSeriesToUpdate", structures[i].reps.length);
         showRepsAndKgsActivity.putExtra("ex_name", structures[i].exercise);
         c.startActivity(showRepsAndKgsActivity);
+    }
+
+    public boolean showDelete(){
+        System.out.println("Clicked");
+        return true;
     }
 }

@@ -81,7 +81,7 @@ public class RepsAndKgsActivity extends AppCompatActivity{
         ((EditText) v.findViewById(R.id.kgsEditText)).setVisibility(View.GONE);
         ((TextView) v.findViewById(R.id.repsTextView)).setVisibility(View.GONE);
         ((TextView) v.findViewById(R.id.kgsTextView)).setVisibility(View.GONE);
-        ((TextView) v.findViewById(R.id.numOfSetTextView)).setText(i+"");
+        ((TextView) v.findViewById(R.id.numOfSetTextView)).setText(i+2+"");
         return v;
     }
 
@@ -97,7 +97,7 @@ public class RepsAndKgsActivity extends AppCompatActivity{
         View v = inflater.inflate(R.layout.set_listview, null);
         ((TextView) v.findViewById(R.id.numOfSetTextView)).setText(i+"");
         ((EditText) v.findViewById(R.id.repsEditText)).setText(reps + "");
-        ((EditText) v.findViewById(R.id.kgsEditText)).setText(kgs + "");
+        ((EditText) v.findViewById(R.id.kgsEditText)).setText(ProfileActivity.getProperVal(String.valueOf(kgs)));
         ((TextView) v.findViewById(R.id.plus)).setVisibility(View.GONE);
         return v;
     }
@@ -112,7 +112,7 @@ public class RepsAndKgsActivity extends AppCompatActivity{
             ++i;
             setsListView.addFooterView(getSetView(i, c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)), c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))));
         }
-        setsListView.addFooterView(getNewSetView(i+1));
+        setsListView.addFooterView(getNewSetView(i-1));
         return ids;
     }
 }
