@@ -79,9 +79,4 @@ public class WorkoutAdapter extends BaseAdapter{
         showRepsAndKgsActivity.putExtra("ex_name", structures[i].exercise);
         c.startActivity(showRepsAndKgsActivity);
     }
-
-    public boolean showDelete(){
-        System.out.println("Clicked");
-        return true;
-    }
 }

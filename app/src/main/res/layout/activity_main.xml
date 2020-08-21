@@ -133,7 +133,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <View
-        android:id="@+id/divider2"
+        android:id="@+id/hDiv1"
         android:layout_width="0dp"
         android:layout_height="3dp"
         android:layout_marginStart="7dp"
@@ -148,7 +148,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <View
-        android:id="@+id/divider3"
+        android:id="@+id/hDiv2"
         android:layout_width="0dp"
         android:layout_height="3dp"
         android:layout_marginStart="7dp"
@@ -162,7 +162,7 @@
         app:layout_constraintTop_toBottomOf="@+id/workoutListView" />
 
     <View
-        android:id="@+id/divider4"
+        android:id="@+id/vDiv1"
         android:layout_width="3dp"
         android:layout_height="0dp"
         android:layout_marginTop="67dp"
@@ -173,7 +173,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
-        android:id="@+id/divider5"
+        android:id="@+id/vDiv2"
         android:layout_width="3dp"
         android:layout_height="0dp"
         android:layout_marginTop="67dp"

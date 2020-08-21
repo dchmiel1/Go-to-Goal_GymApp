@@ -6,11 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -50,8 +50,7 @@ public class MainActivity extends AppCompatActivity {
         date = new Date();
         dateTextView.setText("Today");
 
-        workoutLayout.setOnItemLongClickListener((adapterView, view, i, l) -> showDelete());
-        workoutLayout.setOnItemClickListener((adapterView, view, i, l) -> updateSets());
+        workoutLayout.setOnItemLongClickListener((adapterView, view, i, l) -> showDelete(view));
 
         if(dbHelper == null) {
             dbHelper = new DbHelper(this);
@@ -76,16 +75,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         rightImageBtn.setOnClickListener(view -> {
-            workoutLayout.startAnimation(slideLeftIn);
-            emptyTextView.startAnimation(slideLeftIn);
+            setAnimation(slideLeftIn);
             date = new Date(date.getTime() + (1000 * 60 * 60 * 24));
             setDate(dateTextView);
             checkWorkout();
         });
 
         leftImageBtn.setOnClickListener(view -> {
-            workoutLayout.startAnimation(slideRightIn);
-            emptyTextView.startAnimation(slideRightIn);
+            setAnimation(slideRightIn);
             date = new Date(date.getTime() - (1000 * 60 * 60 * 24));
             setDate(dateTextView);
             checkWorkout();
@@ -164,12 +161,19 @@ public class MainActivity extends AppCompatActivity {
         workoutLayout.setAdapter(workoutAdapter);
     }
 
-    public boolean showDelete(){
-        System.out.println("Clicked from layout");
+    public boolean showDelete(View view){
+
+        System.out.println(view.toString());
+        view.setBackgroundColor(0);
         return true;
     }
 
-    public void updateSets(){
-        System.out.println("Clicked once");
+    private void setAnimation(Animation anim){
+        workoutLayout.startAnimation(anim);
+        emptyTextView.startAnimation(anim);
+        findViewById(R.id.hDiv1).startAnimation(anim);
+        findViewById(R.id.hDiv2).startAnimation(anim);
+        findViewById(R.id.vDiv1).startAnimation(anim);
+        findViewById(R.id.vDiv2).startAnimation(anim);
     }
 }
