@@ -4,11 +4,6 @@
         <item
             android:id="@+id/best_done"
             android:enabled="true"
-            android:title="Done last"/>
-
-        <item
-            android:id="@+id/last_done"
-            android:enabled="true"
             android:title="Done best"/>
         <item
             android:id="@+id/last_calculated"

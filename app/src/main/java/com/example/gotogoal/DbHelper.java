@@ -138,25 +138,11 @@ public class DbHelper extends SQLiteOpenHelper {
         return c;
     }
 
-    public double getLastOneRep(String exName){
+    public double getBestRep(String exName){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_KG_ADDED +
                 " from " + DbNames.TABLE_NAME +
-                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" + exName + "'" + " and " + DbNames.COLUMN_NAME_REPS + " = 1 " +
-                "order by " + DbNames.COLUMN_NAME_DATE + " DESC", null);
-        if(c.getCount() > 0) {
-            c.moveToNext();
-            return c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED));
-        }
-        else
-            return -1;
-    }
-
-    public double getBestOneRep(String exName){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_KG_ADDED +
-                " from " + DbNames.TABLE_NAME +
-                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'"+ exName +"'" + " and " + DbNames.COLUMN_NAME_REPS + " = 1 " +
+                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'"+ exName +"'" +
                 "order by " + DbNames.COLUMN_NAME_KG_ADDED + " DESC", null);
         if(c.getCount() > 0) {
             c.moveToNext();

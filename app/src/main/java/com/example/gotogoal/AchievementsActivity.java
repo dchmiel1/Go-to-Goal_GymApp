@@ -33,14 +33,11 @@ public class AchievementsActivity extends AppCompatActivity {
         sumTextView = (TextView) findViewById(R.id.oneRepSum);
         pullUpTextView = (TextView) findViewById(R.id.oneRepPullUp);
         dipTextView = (TextView) findViewById(R.id.oneRepDip);
-        setValues(dbHelper::getLastOneRep);
+        setValues(dbHelper::getBestRep);
 
         navigationView.setOnNavigationItemSelectedListener(item -> {
             Function<String, Double> getValue;
             switch(item.toString()){
-                case "Done last":
-                    getValue = dbHelper::getLastOneRep;
-                    break;
                 case "Last calc.":
                     getValue = dbHelper::getCalculatedLastOneRep;
                     break;
@@ -48,7 +45,7 @@ public class AchievementsActivity extends AppCompatActivity {
                     getValue = dbHelper::getCalculatedBestOneRep;
                     break;
                 default:
-                    getValue = dbHelper::getBestOneRep;
+                    getValue = dbHelper::getBestRep;
                     break;
             }
             setValues(getValue);
