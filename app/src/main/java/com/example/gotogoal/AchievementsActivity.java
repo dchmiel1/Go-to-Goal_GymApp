@@ -11,7 +11,7 @@ import java.util.function.Function;
 public class AchievementsActivity extends AppCompatActivity {
 
     private DbHelper dbHelper;
-    private String[] exercises = {"Flat barbell bench press", "Barbell squat", "Sumo deadlift", "Classic deadlift", "Pull up", "Dip"};
+    private String[] exercises = {"'Flat barbell bench press'", "'Barbell squat'", "'Sumo deadlift' OR exercise = 'Classic deadlift'", "'Pull up'", "'Dip'"};
 
     TextView benchPressTextView;
     TextView squatTextView;
@@ -56,7 +56,7 @@ public class AchievementsActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void setValues(Function<String, Double> getValue){
-        double[] values = new double[6];
+        double[] values = new double[5];
         for(int i = 0; i < values.length; i ++){
             values[i] = getValue.apply(exercises[i]);
             if(values[i] == -1)
@@ -64,12 +64,9 @@ public class AchievementsActivity extends AppCompatActivity {
         }
         benchPressTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[0])));
         squatTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[1])));
-        if(values[2] > values[3])
-            deadliftTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[2])));
-        else
-            deadliftTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[3])));
+        deadliftTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[2])));
         sumTextView.setText(ProfileActivity.getProperVal(String.valueOf(Double.parseDouble(benchPressTextView.getText().toString()) + Double.parseDouble(squatTextView.getText().toString()) + Double.parseDouble(deadliftTextView.getText().toString()))));
-        pullUpTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[4])));
-        dipTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[5])));
+        pullUpTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[3])));
+        dipTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[4])));
     }
 }

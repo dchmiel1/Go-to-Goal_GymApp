@@ -47,7 +47,7 @@ public class DbHelper extends SQLiteOpenHelper {
         values.put(DbNames.COLUMN_NAME_EXERCISE, exName);
         values.put(DbNames.COLUMN_NAME_REPS, reps);
         values.put(DbNames.COLUMN_NAME_KG_ADDED, kgAdded);
-        if(exName.equals("Pull up") || exName.equals("Dip") && reps <= 20) {
+        if(exName.equals("'Pull up'") || exName.equals("'Dip'") && reps <= 20) {
             Cursor c = findLastWeight();
             c.moveToNext();
             values.put(DbNames.COLUMN_NAME_ONE_REP, ((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
@@ -142,7 +142,7 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_KG_ADDED +
                 " from " + DbNames.TABLE_NAME +
-                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'"+ exName +"'" +
+                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + exName +
                 "order by " + DbNames.COLUMN_NAME_KG_ADDED + " DESC", null);
         if(c.getCount() > 0) {
             c.moveToNext();
@@ -155,9 +155,10 @@ public class DbHelper extends SQLiteOpenHelper {
     public double getCalculatedLastOneRep(String exName){
         SQLiteDatabase db = this.getReadableDatabase();
         String lastDate;
-        Cursor dateCursor = db.rawQuery("select " + DbNames.COLUMN_NAME_DATE +
+        Cursor dateCursor;
+        dateCursor = db.rawQuery("select " + DbNames.COLUMN_NAME_DATE +
                 " from " + DbNames.TABLE_NAME +
-                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" + exName + "'" +
+                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + exName +
                 "order by " + DbNames.COLUMN_NAME_DATE + " DESC", null);
         if(dateCursor.getCount() > 0){
             dateCursor.moveToNext();
@@ -167,7 +168,7 @@ public class DbHelper extends SQLiteOpenHelper {
         }
         Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_ONE_REP +
                 " from " + DbNames.TABLE_NAME +
-                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" +exName+ "'" + " and " + DbNames.COLUMN_NAME_DATE + " = " + "'" +lastDate+ "'" +
+                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + exName + " and " + DbNames.COLUMN_NAME_DATE + " = " + "'" +lastDate+ "'" +
                 " order by " + DbNames.COLUMN_NAME_ONE_REP + " DESC", null);
         if(c.getCount() > 0) {
             c.moveToNext();
@@ -181,7 +182,7 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_ONE_REP +
                 " from " + DbNames.TABLE_NAME +
-                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" +exName+ "'" +
+                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + exName +
                 "order by " + DbNames.COLUMN_NAME_ONE_REP + " DESC", null);
         if(c.getCount() > 0) {
             c.moveToNext();
@@ -196,7 +197,7 @@ public class DbHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(DbNames.COLUMN_NAME_REPS, reps);
         values.put(DbNames.COLUMN_NAME_KG_ADDED, kgs);
-        if(exName.equals("Pull up") || exName.equals("Dip") && reps <= 20) {
+        if(exName.equals("'Pull up'") || exName.equals("'Dip'") && reps <= 20) {
             Cursor c = findLastWeight();
             c.moveToNext();
             values.put(DbNames.COLUMN_NAME_ONE_REP, ((kgs +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
