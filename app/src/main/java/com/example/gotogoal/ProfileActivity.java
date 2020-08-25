@@ -27,7 +27,7 @@ public class ProfileActivity extends AppCompatActivity {
         final Button saveBtn = (Button) findViewById(R.id.saveBtn);
         final TextView bmiTextView = (TextView) findViewById(R.id.bmiTextView);
 
-        Cursor c = dbHelper.findLastWeight();
+        Cursor c = dbHelper.getLastWeight();
         if(c.getCount()> 0) {
             c.moveToNext();
             String weight = getProperVal(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))));

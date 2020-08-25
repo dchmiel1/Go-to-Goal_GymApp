@@ -1,14 +1,19 @@
 package com.example.gotogoal;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -21,15 +26,20 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import static android.view.View.VISIBLE;
+
 public class MainActivity extends AppCompatActivity {
 
     public static Date date;
     public static DbHelper dbHelper;
     private TextView emptyTextView;
     private ListView workoutLayout;
+    private ImageView deleteImageView;
     private LayoutInflater inflater;
+    private WorkoutAdapter workoutAdapter;
     public static int multiplier[];
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,14 +60,10 @@ public class MainActivity extends AppCompatActivity {
         date = new Date();
         dateTextView.setText("Today");
 
-        workoutLayout.setOnItemLongClickListener((adapterView, view, i, l) -> showDelete(view));
-
         if(dbHelper == null) {
-            dbHelper = new DbHelper(this);
+            dbHelper = new DbHelper(this, this);
         }
-
         checkWorkout();
-        dbHelper.showAll();
 
         achievementsImageView.setOnClickListener(view -> {
             Intent showAchievementsIntent = new Intent(getApplicationContext(), AchievementsActivity.class);
@@ -124,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkWorkout(){
+    public void checkWorkout(){
         String dateString = new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(date);
         Cursor c2 = dbHelper.getExercisesByDate(dateString);
         int howMany = c2.getCount();
@@ -157,15 +163,8 @@ public class MainActivity extends AppCompatActivity {
                 ++k;
             }
         }
-        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, structures);
+        workoutAdapter = new WorkoutAdapter(this, structures);
         workoutLayout.setAdapter(workoutAdapter);
-    }
-
-    public boolean showDelete(View view){
-
-        System.out.println(view.toString());
-        view.setBackgroundColor(0);
-        return true;
     }
 
     private void setAnimation(Animation anim){

@@ -21,12 +21,12 @@ public class DbHelper extends SQLiteOpenHelper {
                     DbNames.COLUMN_NAME_REPS + " INTEGER, " +
                     DbNames.COLUMN_NAME_KG_ADDED + " REAL, " +
                     DbNames.COLUMN_NAME_ONE_REP + " REAL);";
+    private static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + DbNames.TABLE_NAME;
+    private MainActivity mainActivity;
 
-    private static final String SQL_DELETE_TABLE =
-            "DROP TABLE IF EXISTS " + DbNames.TABLE_NAME;
-
-    public DbHelper(Context c){
+    public DbHelper(Context c, MainActivity mainActivity){
         super(c, DATABASE_NAME, null, DATABASE_VERSION);
+        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class DbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertSet (String exName, int reps, double kgAdded) {
+    public void insertSet (String exName, int reps, double kgAdded) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DbNames.COLUMN_NAME_DATE, new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(MainActivity.date));
@@ -48,7 +48,7 @@ public class DbHelper extends SQLiteOpenHelper {
         values.put(DbNames.COLUMN_NAME_REPS, reps);
         values.put(DbNames.COLUMN_NAME_KG_ADDED, kgAdded);
         if(exName.equals("'Pull up'") || exName.equals("'Dip'") && reps <= 20) {
-            Cursor c = findLastWeight();
+            Cursor c = getLastWeight();
             c.moveToNext();
             values.put(DbNames.COLUMN_NAME_ONE_REP, ((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
         }else if(reps <= 20)
@@ -56,51 +56,6 @@ public class DbHelper extends SQLiteOpenHelper {
         else
             values.put(DbNames.COLUMN_NAME_ONE_REP, kgAdded);
         db.insert(DbNames.TABLE_NAME, null, values);
-        return true;
-    }
-
-    public Cursor getById(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from " + DbNames.TABLE_NAME + " where _id="+id+"", null );
-        return res;
-    }
-
-    public Cursor getExercisesByDate(String date){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("select distinct " + DbNames.COLUMN_NAME_EXERCISE +
-                                    " from " + DbNames.TABLE_NAME +
-                                    " where date =" + "'" + date + "'" + " and " + DbNames.COLUMN_NAME_EXERCISE + " != 'weight'"
-                                    , null);
-        return c;
-    }
-
-    public Cursor getSetsByDateAndExercise(String date, String exercise){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_EXERCISE + ", " + DbNames.COLUMN_NAME_REPS + ", " + DbNames.COLUMN_NAME_KG_ADDED +", "+ DbNames._ID+
-                                " from " + DbNames.TABLE_NAME + " " +
-                                "where " + DbNames.COLUMN_NAME_DATE + " =" + "'" + date + "'" + " and " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" + exercise +"'" + "", null);
-        return c;
-    }
-
-    public void showAll(){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + DbNames.TABLE_NAME+"", null);
-        while(res.moveToNext()) {
-            System.out.println("id: " + res.getLong(res.getColumnIndexOrThrow(DbNames._ID)));
-            System.out.println("date: " +res.getString(res.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE)));
-            System.out.println("exerciseName: " + res.getString(res.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE)));
-            System.out.println("reps: " +res.getString(res.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
-            System.out.println("kgAdded: " +res.getString(res.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
-            System.out.println(("one rep:" + res.getString(res.getColumnIndexOrThrow((DbNames.COLUMN_NAME_ONE_REP)))));
-            System.out.println("");
-        }
-    }
-
-    public void deleteSet (Integer id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("sets_table",
-                "_id = ? ",
-                new String[] { Integer.toString(id) });
     }
 
     public void insertOrUpdateWeight(double kgs, int cms){
@@ -120,22 +75,48 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-    private boolean isWeightThatDate(String date){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("select * " +
-                                    " from " + DbNames.TABLE_NAME + " " +
-                                    " where " + DbNames.COLUMN_NAME_DATE + " =" + "'" + date + "' and " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight'", null);
-        System.out.println(c.getCount() > 0);
-        return c.getCount() > 0;
+    public void updateSet(int id, int reps, double kgs, String exName){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DbNames.COLUMN_NAME_REPS, reps);
+        values.put(DbNames.COLUMN_NAME_KG_ADDED, kgs);
+        if(exName.equals("'Pull up'") || exName.equals("'Dip'") && reps <= 20) {
+            Cursor c = getLastWeight();
+            c.moveToNext();
+            values.put(DbNames.COLUMN_NAME_ONE_REP, ((kgs +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+        }else if(reps <= 20)
+            values.put(DbNames.COLUMN_NAME_ONE_REP, kgs/((double)MainActivity.multiplier[reps]/100));
+        else
+            values.put(DbNames.COLUMN_NAME_ONE_REP, kgs);
+        db.update(DbNames.TABLE_NAME, values, " _id = ?", new String[]{String.valueOf(id)});
     }
 
-    public Cursor findLastWeight(){
+    public Cursor getById(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_KG_ADDED + ", " + DbNames.COLUMN_NAME_REPS +
-                                " from " + DbNames.TABLE_NAME +
-                                " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight' " +
-                                "order by " + DbNames.COLUMN_NAME_DATE + " DESC", null);
-        return c;
+        return db.rawQuery( "select * from " + DbNames.TABLE_NAME + " where _id="+id+"", null );
+    }
+
+    public Cursor getExercisesByDate(String date){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("select distinct " + DbNames.COLUMN_NAME_EXERCISE +
+                        " from " + DbNames.TABLE_NAME +
+                        " where date =" + "'" + date + "'" + " and " + DbNames.COLUMN_NAME_EXERCISE + " != 'weight'"
+                , null);
+    }
+
+    public Cursor getSetsByDateAndExercise(String date, String exercise){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("select " + DbNames.COLUMN_NAME_EXERCISE + ", " + DbNames.COLUMN_NAME_REPS + ", " + DbNames.COLUMN_NAME_KG_ADDED +", "+ DbNames._ID+
+                " from " + DbNames.TABLE_NAME + " " +
+                "where " + DbNames.COLUMN_NAME_DATE + " =" + "'" + date + "'" + " and " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" + exercise +"'" + "", null);
+    }
+
+    public Cursor getLastWeight(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("select " + DbNames.COLUMN_NAME_KG_ADDED + ", " + DbNames.COLUMN_NAME_REPS +
+                " from " + DbNames.TABLE_NAME +
+                " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight' " +
+                "order by " + DbNames.COLUMN_NAME_DATE + " DESC", null);
     }
 
     public double getBestRep(String exName){
@@ -192,19 +173,27 @@ public class DbHelper extends SQLiteOpenHelper {
             return -1;
     }
 
-    public void updateSet(int id, int reps, double kgs, String exName){
+    public void deleteById (Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DbNames.COLUMN_NAME_REPS, reps);
-        values.put(DbNames.COLUMN_NAME_KG_ADDED, kgs);
-        if(exName.equals("'Pull up'") || exName.equals("'Dip'") && reps <= 20) {
-            Cursor c = findLastWeight();
-            c.moveToNext();
-            values.put(DbNames.COLUMN_NAME_ONE_REP, ((kgs +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
-        }else if(reps <= 20)
-            values.put(DbNames.COLUMN_NAME_ONE_REP, kgs/((double)MainActivity.multiplier[reps]/100));
-        else
-            values.put(DbNames.COLUMN_NAME_ONE_REP, kgs);
-        db.update(DbNames.TABLE_NAME, values, " _id = ?", new String[]{String.valueOf(id)});
+        db.delete("sets_table",
+                "_id = ? ",
+                new String[] { Integer.toString(id) });
+    }
+
+    public void deleteByDateAndExercise(String exName){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String date = new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(MainActivity.date);
+        db.delete("sets_table",
+                " exercise = ? AND date = ?",
+                new String[] { exName, date });
+        mainActivity.checkWorkout();
+    }
+
+    private boolean isWeightThatDate(String date){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("select * " +
+                " from " + DbNames.TABLE_NAME + " " +
+                " where " + DbNames.COLUMN_NAME_DATE + " =" + "'" + date + "' and " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight'", null);
+        return c.getCount() > 0;
     }
 }

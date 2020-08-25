@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/exerciseLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -34,4 +35,29 @@
         android:layout_marginTop="53dp"
         android:clickable="true"
         android:longClickable="true" />
+
+    <View
+        android:id="@+id/clickView"
+        android:layout_width="379dp"
+        android:layout_height="333dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp" />
+
+    <ImageView
+        android:id="@+id/deleteImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="309dp"
+        android:layout_marginLeft="309dp"
+        android:layout_marginTop="14dp"
+        android:visibility="gone"
+        app:srcCompat="@android:drawable/btn_dialog" />
+
 </RelativeLayout>

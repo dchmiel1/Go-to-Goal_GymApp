@@ -2,33 +2,33 @@ package com.example.gotogoal;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.annotation.RequiresApi;
 
-import java.util.function.Consumer;
+import static android.view.View.VISIBLE;
 
 public class WorkoutAdapter extends BaseAdapter{
 
-    String[]  exercises;
     LayoutInflater inflater;
-    ListView adapterListView[];
-    MainActivity.Structure structures[];
+    MainActivity.Structure[] structures;
     Context c;
+    DbHelper dbHelper;
 
     public WorkoutAdapter(Context c, MainActivity.Structure[] structures){
         this.structures = structures;
         this.c = c;
         this.inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        dbHelper = MainActivity.dbHelper;
     }
 
     @Override
@@ -53,15 +53,20 @@ public class WorkoutAdapter extends BaseAdapter{
 
         TextView exNameTextView = (TextView) v.findViewById(R.id.exNameTextView);
         ListView listView = (ListView) v.findViewById(R.id.setsListView);
+        ImageView deleteImageView = (ImageView) v.findViewById(R.id.deleteImageView);
+        View clickView = (View) v.findViewById(R.id.clickView);
+        clickView.setOnClickListener(view1 -> updateSets(i));
+        clickView.setOnLongClickListener(view1 -> showDelete(v, i));
+
         RelativeLayout.LayoutParams mParam = new RelativeLayout.LayoutParams((int)(975),(int)(148 + 3 + 3 + structures[i].reps.length * 126));
         v.setLayoutParams(mParam);
-        listView.setAdapter(new ArrayAdapter<String>(c, R.layout.exercise_in_workout_listview, new String[0]));
-        exNameTextView.setOnClickListener(view1 -> updateSets(i));
-        listView.setOnItemClickListener((adapterView, view1, i1, l) -> updateSets(i));
+        listView.setAdapter(new ArrayAdapter<>(c, R.layout.exercise_in_workout_listview, new String[0]));
+        deleteImageView.setOnClickListener(view1 -> dbHelper.deleteByDateAndExercise(structures[i].exercise));
 
         for(int j = 0; j < structures[i].reps.length; j ++)
             listView.addFooterView(newListViewItem(structures[i].reps[j], structures[i].kgs[j]));
         exNameTextView.setText(structures[i].exercise);
+
         return v;
     }
 
@@ -79,4 +84,20 @@ public class WorkoutAdapter extends BaseAdapter{
         showRepsAndKgsActivity.putExtra("ex_name", structures[i].exercise);
         c.startActivity(showRepsAndKgsActivity);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private boolean showDelete(View v, int i){
+        ((ImageView) v.findViewById(R.id.deleteImageView)).setVisibility(VISIBLE);
+        ((View) v.findViewById(R.id.clickView)).setOnClickListener(view -> hideDelete(v, i));
+        v.setBackgroundColor(0xFF1E90FF);
+        return true;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void hideDelete(View v, int i){
+        ((ImageView) v.findViewById(R.id.deleteImageView)).setVisibility(View.GONE);
+        ((View) v.findViewById(R.id.clickView)).setOnClickListener(view -> updateSets(i));
+        v.setBackground(c.getResources().getDrawable(R.drawable.border_dark_blue, null));
+    }
+
 }

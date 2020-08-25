@@ -60,7 +60,7 @@ public class RepsAndKgsActivity extends AppCompatActivity{
                     dbHelper.updateSet(idsToUpdate[i], Integer.parseInt(reps), Double.parseDouble(kgs), exName);
                 }
                 else{
-                    dbHelper.deleteSet(idsToUpdate[i]);
+                    dbHelper.deleteById(idsToUpdate[i]);
                 }
             }
             for(int i = idsToUpdate.length; i < idsToUpdate.length + newSets; i ++){
