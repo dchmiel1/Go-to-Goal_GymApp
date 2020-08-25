@@ -173,6 +173,13 @@ public class DbHelper extends SQLiteOpenHelper {
             return -1;
     }
 
+    public Cursor getWeightData(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("select " + DbNames.COLUMN_NAME_DATE + ", " + DbNames.COLUMN_NAME_KG_ADDED +
+                            " from " + DbNames.TABLE_NAME +
+                            " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight'", null);
+    }
+
     public void deleteById (Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("sets_table",
@@ -195,5 +202,19 @@ public class DbHelper extends SQLiteOpenHelper {
                 " from " + DbNames.TABLE_NAME + " " +
                 " where " + DbNames.COLUMN_NAME_DATE + " =" + "'" + date + "' and " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight'", null);
         return c.getCount() > 0;
+    }
+
+    public void showAll(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery( "select * from " + DbNames.TABLE_NAME, null );
+        while(c.moveToNext()){
+            System.out.println("************");
+            System.out.println("ID: " + c.getInt(c.getColumnIndexOrThrow(DbNames._ID)));
+            System.out.println("ex: " +c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE)));
+            System.out.println("date: " + c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE)));
+            System.out.println("kg_added: " + c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+            System.out.println("reps: " + c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
+            System.out.println("one_rep: " +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_ONE_REP)));
+        }
     }
 }

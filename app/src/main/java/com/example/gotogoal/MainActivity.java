@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         }
         checkWorkout();
 
+        dbHelper.showAll();
+
         achievementsImageView.setOnClickListener(view -> {
             Intent showAchievementsIntent = new Intent(getApplicationContext(), AchievementsActivity.class);
             startActivity(showAchievementsIntent);

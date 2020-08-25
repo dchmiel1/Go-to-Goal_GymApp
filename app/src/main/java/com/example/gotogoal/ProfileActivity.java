@@ -4,14 +4,27 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.jjoe64.graphview.DefaultLabelFormatter;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.PointsGraphSeries;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private DbHelper dbHelper;
+    private SimpleDateFormat dateFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +32,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         dbHelper = MainActivity.dbHelper;
+        dateFormat = new SimpleDateFormat("dd MMM");
         final TextView weightTextView = (TextView) findViewById(R.id.weightTextView);
         final TextView heightTextView = (TextView) findViewById(R.id.heightTextView);
         final EditText heightEditText = (EditText) findViewById(R.id.heightEditText);
@@ -26,6 +40,22 @@ public class ProfileActivity extends AppCompatActivity {
         final Button changeValBtn = (Button) findViewById(R.id.changeValBtn);
         final Button saveBtn = (Button) findViewById(R.id.saveBtn);
         final TextView bmiTextView = (TextView) findViewById(R.id.bmiTextView);
+        final GraphView weightGraph = (GraphView) findViewById(R.id.weightGraph);
+
+        weightGraph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
+            @Override
+            public String formatLabel(double value, boolean isValueX){
+                if(isValueX){
+                    return dateFormat.format(new Date((long) value));
+                } else {
+                    return super.formatLabel(value, false);
+                }
+            }
+        });
+        weightGraph.addSeries(getGraphPoints());
+        weightGraph.addSeries(getGraphLines());
+
+
 
         Cursor c = dbHelper.getLastWeight();
         if(c.getCount()> 0) {
@@ -65,6 +95,9 @@ public class ProfileActivity extends AppCompatActivity {
                 weightTextView.setVisibility(View.VISIBLE);
                 heightTextView.setVisibility(View.VISIBLE);
                 saveBtn.setVisibility(View.GONE);
+                weightGraph.removeAllSeries();
+                weightGraph.addSeries(getGraphPoints());
+                weightGraph.addSeries(getGraphLines());
             }
         });
     }
@@ -83,5 +116,39 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
         return sVal;
+    }
+
+    private PointsGraphSeries<DataPoint> getGraphPoints(){
+        Cursor c = dbHelper.getWeightData();
+        DataPoint[] dataPoints = new DataPoint[c.getCount()];
+        SimpleDateFormat formatOfDateInSql = new SimpleDateFormat("yyyy MM dd");
+
+        int i = 0;
+        while(c.moveToNext()){
+            try {
+                dataPoints[i] = new DataPoint(formatOfDateInSql.parse(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE))), c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            ++i;
+        }
+        return new PointsGraphSeries<DataPoint>(dataPoints);
+    }
+
+    private LineGraphSeries<DataPoint> getGraphLines(){
+        Cursor c = dbHelper.getWeightData();
+        DataPoint[] dataPoints = new DataPoint[c.getCount()];
+        SimpleDateFormat formatOfDateInSql = new SimpleDateFormat("yyyy MM dd");
+
+        int i = 0;
+        while(c.moveToNext()){
+            try {
+                dataPoints[i] = new DataPoint(formatOfDateInSql.parse(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE))), c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            ++i;
+        }
+        return new LineGraphSeries<DataPoint>(dataPoints);
     }
 }
