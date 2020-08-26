@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F8EAE1"
     tools:context=".MusclesActivity">
 
     <GridView
         android:id="@+id/gridView"
         android:layout_width="413dp"
         android:layout_height="737dp"
-        android:gravity="center"
         android:columnWidth="100dp"
-        android:numColumns="2"
-        />
+        android:gravity="center"
+        android:numColumns="2" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,9 +18,8 @@ import com.jjoe64.graphview.series.PointsGraphSeries;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
-public class ProfileActivity extends AppCompatActivity {
+public class BodyWeightActivity extends AppCompatActivity {
 
     private DbHelper dbHelper;
     private SimpleDateFormat dateFormat;
@@ -29,7 +27,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_body_weight);
 
         dbHelper = MainActivity.dbHelper;
         dateFormat = new SimpleDateFormat("dd MMM");

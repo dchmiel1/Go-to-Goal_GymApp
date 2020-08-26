@@ -62,11 +62,11 @@ public class AchievementsActivity extends AppCompatActivity {
             if(values[i] == -1)
                 values[i] = 0;
         }
-        benchPressTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[0])));
-        squatTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[1])));
-        deadliftTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[2])));
-        sumTextView.setText(ProfileActivity.getProperVal(String.valueOf(Double.parseDouble(benchPressTextView.getText().toString()) + Double.parseDouble(squatTextView.getText().toString()) + Double.parseDouble(deadliftTextView.getText().toString()))));
-        pullUpTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[3])));
-        dipTextView.setText(ProfileActivity.getProperVal(String.valueOf(values[4])));
+        benchPressTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[0])));
+        squatTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[1])));
+        deadliftTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[2])));
+        sumTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(Double.parseDouble(benchPressTextView.getText().toString()) + Double.parseDouble(squatTextView.getText().toString()) + Double.parseDouble(deadliftTextView.getText().toString()))));
+        pullUpTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[3])));
+        dipTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[4])));
     }
 }

@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -97,7 +96,7 @@ public class RepsAndKgsActivity extends AppCompatActivity{
         View v = inflater.inflate(R.layout.set_listview, null);
         ((TextView) v.findViewById(R.id.numOfSetTextView)).setText(i+"");
         ((EditText) v.findViewById(R.id.repsEditText)).setText(reps + "");
-        ((EditText) v.findViewById(R.id.kgsEditText)).setText(ProfileActivity.getProperVal(String.valueOf(kgs)));
+        ((EditText) v.findViewById(R.id.kgsEditText)).setText(BodyWeightActivity.getProperVal(String.valueOf(kgs)));
         ((TextView) v.findViewById(R.id.plus)).setVisibility(View.GONE);
         return v;
     }

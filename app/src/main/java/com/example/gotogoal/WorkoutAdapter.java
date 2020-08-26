@@ -2,7 +2,6 @@ package com.example.gotogoal;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,8 +73,8 @@ public class WorkoutAdapter extends BaseAdapter{
         View v = inflater.inflate(R.layout.exercise_in_workout_listview, null);
         TextView repsTextView = (TextView) v.findViewById(R.id.repsTextView);
         TextView kgsTextView = (TextView) v.findViewById(R.id.kgsTextView);
-        repsTextView.setText(ProfileActivity.getProperVal(reps));
-        kgsTextView.setText(ProfileActivity.getProperVal(kgs));
+        repsTextView.setText(BodyWeightActivity.getProperVal(reps));
+        kgsTextView.setText(BodyWeightActivity.getProperVal(kgs));
         return v;
     }
 
@@ -97,7 +96,7 @@ public class WorkoutAdapter extends BaseAdapter{
     private void hideDelete(View v, int i){
         ((ImageView) v.findViewById(R.id.deleteImageView)).setVisibility(View.GONE);
         ((View) v.findViewById(R.id.clickView)).setOnClickListener(view -> updateSets(i));
-        v.setBackground(c.getResources().getDrawable(R.drawable.border_dark_blue, null));
+        v.setBackground(c.getResources().getDrawable(R.drawable.border_dark_orange, null));
     }
 
 }

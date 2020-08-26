@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +30,13 @@ public class MainActivity extends AppCompatActivity {
     private LayoutInflater inflater;
     private WorkoutAdapter workoutAdapter;
     public static int multiplier[];
+
+    @Override
+    public Resources.Theme getTheme() {
+        Resources.Theme theme = super.getTheme();
+        theme.applyStyle(R.style.AppThemeWithoutBar, true);
+        return theme;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -64,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         profileImageView.setOnClickListener(view -> {
-            Intent showProfileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+            Intent showProfileIntent = new Intent(getApplicationContext(), BodyWeightActivity.class);
             startActivity(showProfileIntent);
         });
 

@@ -4,7 +4,7 @@
     android:id="@+id/exerciseLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/border_dark_blue"
+    android:background="@drawable/border_dark_orange"
     android:clickable="true"
     android:longClickable="true">
 

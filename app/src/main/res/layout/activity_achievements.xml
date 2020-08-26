@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F8EAE1"
     tools:context=".AchievementsActivity">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigationBar"
         android:layout_width="410dp"
         android:layout_height="48dp"
-        android:background="#FFFFFF"
+        android:background="#A3000000"
         android:clipChildren="true"
         android:fadingEdge="vertical"
         android:keepScreenOn="true"
