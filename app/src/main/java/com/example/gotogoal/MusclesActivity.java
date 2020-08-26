@@ -28,13 +28,10 @@ public class MusclesActivity extends AppCompatActivity {
         MuscleAdapter muscleAdapter = new MuscleAdapter(this, muscles);
         gridView.setAdapter(muscleAdapter);
 
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        gridView.setOnItemClickListener((adapterView, view, i, l) -> {
                 Intent showExercisesIntent = new Intent(getApplicationContext(), ExercisesActivity.class);
                 showExercisesIntent.putExtra("muscleId", i);
                 startActivity(showExercisesIntent);
-            }
         });
     }
 }

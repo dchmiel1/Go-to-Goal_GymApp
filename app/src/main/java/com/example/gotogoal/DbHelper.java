@@ -58,20 +58,21 @@ public class DbHelper extends SQLiteOpenHelper {
         db.insert(DbNames.TABLE_NAME, null, values);
     }
 
-    public void insertOrUpdateWeight(double kgs, int cms){
+    public void insertWeight(double kgs){
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
         String date = new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(new Date());
-        values.put(DbNames.COLUMN_NAME_DATE, date);
-        values.put(DbNames.COLUMN_NAME_EXERCISE, "weight");
-        values.put(DbNames.COLUMN_NAME_REPS, cms);
-        values.put(DbNames.COLUMN_NAME_KG_ADDED, kgs);
-        values.put(DbNames.COLUMN_NAME_ONE_REP, 0);
         if(isWeightThatDate(date)) {
+            ContentValues values = new ContentValues();
+            values.put(DbNames.COLUMN_NAME_DATE, date);
+            values.put(DbNames.COLUMN_NAME_EXERCISE, "weight");
+            values.put(DbNames.COLUMN_NAME_REPS, 0);
+            values.put(DbNames.COLUMN_NAME_KG_ADDED, kgs);
+            values.put(DbNames.COLUMN_NAME_ONE_REP, 0);
             db.update(DbNames.TABLE_NAME, values,  "date = ? and exercise = 'weight'", new String[]{date});
         }
         else{
-            insertSet("weight", cms, kgs);
+            MainActivity.date = new Date();
+            insertSet("weight", 0, kgs);
         }
     }
 
@@ -89,6 +90,11 @@ public class DbHelper extends SQLiteOpenHelper {
         else
             values.put(DbNames.COLUMN_NAME_ONE_REP, kgs);
         db.update(DbNames.TABLE_NAME, values, " _id = ?", new String[]{String.valueOf(id)});
+    }
+
+    public Cursor getProfileInfo(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("select * from " + DbNames.TABLE_NAME + " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'profile_info'", null);
     }
 
     public Cursor getById(int id) {

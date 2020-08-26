@@ -9,18 +9,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AchievementsActivity"
-            android:label="Achievements"/>
+        <activity
+            android:name=".AchievementsActivity"
+            android:label="Achievements" />
         <activity
             android:name=".RepsAndKgsActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:label="Workout tracking"/>
-        <activity android:name=".ExercisesActivity"
-            android:label="Exercises"/>
-        <activity android:name=".MusclesActivity"
-            android:label="Muscles"/>
-        <activity android:name=".BodyWeightActivity"
-            android:label="Body weight"/>
+            android:label="Workout tracking"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".ExercisesActivity"
+            android:label="Exercises" />
+        <activity
+            android:name=".MusclesActivity"
+            android:label="Muscles" />
+        <activity
+            android:name=".BodyWeightActivity"
+            android:label="Body weight" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

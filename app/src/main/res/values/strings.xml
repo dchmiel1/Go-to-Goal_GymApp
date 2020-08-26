@@ -102,4 +102,11 @@
         <item>Side plank</item>
     </string-array>
 
+    <string-array name="profile_list_view_titles">
+        <item>Sex</item>
+        <item>Birthday</item>
+        <item>Height</item>
+        <item>Weight</item>
+    </string-array>
+
 </resources>

@@ -9,9 +9,9 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigationBar"
-        android:layout_width="410dp"
+        android:layout_width="412dp"
         android:layout_height="48dp"
-        android:background="#A3000000"
+        android:background="#393737"
         android:clipChildren="true"
         android:fadingEdge="vertical"
         android:keepScreenOn="true"
