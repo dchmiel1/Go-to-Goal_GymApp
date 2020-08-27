@@ -63,53 +63,12 @@
         android:layout_marginRight="200dp"
         android:layout_marginBottom="300dp"
         android:background="#4AF8EAE1"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.481">
-
-        <com.shawnlin.numberpicker.NumberPicker
-            android:id="@+id/datePicker2"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="0dp"
-            android:visibility="visible"
-            app:np_dividerColor="@android:color/holo_orange_dark"
-            app:np_height="180dp"
-            app:np_max="12"
-            app:np_min="1"
-            app:np_selectedTextColor="@android:color/holo_orange_dark"
-            app:np_value="70"
-            app:np_width="64dp" />
-
-        <com.shawnlin.numberpicker.NumberPicker
-            android:id="@+id/datePicker3"
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="55dp"
-            android:layout_marginLeft="55dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="0dp"
-            android:visibility="visible"
-            app:np_dividerColor="@android:color/holo_orange_dark"
-            app:np_height="180dp"
-            app:np_max="2020"
-            app:np_min="1920"
-            app:np_selectedTextColor="@android:color/holo_orange_dark"
-            app:np_value="70"
-            app:np_width="64dp" />
 
         <com.shawnlin.numberpicker.NumberPicker
             android:id="@+id/sexPicker"
@@ -128,23 +87,6 @@
             app:np_height="180dp"
             app:np_max="1"
             app:np_min="0"
-            app:np_selectedTextColor="@android:color/holo_orange_dark"
-            app:np_value="1"
-            app:np_width="64dp" />
-
-        <com.shawnlin.numberpicker.NumberPicker
-            android:id="@+id/datePicker1"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="0dp"
-            android:visibility="gone"
-            app:np_dividerColor="@android:color/holo_orange_dark"
-            app:np_height="180dp"
-            app:np_max="31"
-            app:np_min="1"
             app:np_selectedTextColor="@android:color/holo_orange_dark"
             app:np_value="1"
             app:np_width="64dp" />
@@ -223,6 +165,81 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/plus2" />
+
+    <RelativeLayout
+        android:id="@+id/datePickersLayout"
+        android:layout_width="233dp"
+        android:layout_height="167dp"
+        android:background="#4AF8EAE1"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/darkView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.shawnlin.numberpicker.NumberPicker
+            android:id="@+id/datePicker3"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="130dp"
+            android:layout_marginLeft="130dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:visibility="visible"
+            app:np_dividerColor="@android:color/holo_orange_dark"
+            app:np_height="180dp"
+            app:np_max="2020"
+            app:np_min="1920"
+            app:np_selectedTextColor="@android:color/holo_orange_dark"
+            app:np_value="1990"
+            app:np_width="64dp" />
+
+        <com.shawnlin.numberpicker.NumberPicker
+            android:id="@+id/datePicker1"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="35dp"
+            android:layout_marginLeft="35dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:visibility="visible"
+            app:np_dividerColor="@android:color/holo_orange_dark"
+            app:np_height="180dp"
+            app:np_max="31"
+            app:np_min="1"
+            app:np_selectedTextColor="@android:color/holo_orange_dark"
+            app:np_value="1"
+            app:np_width="64dp" />
+
+        <com.shawnlin.numberpicker.NumberPicker
+            android:id="@+id/datePicker2"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="81dp"
+            android:layout_marginLeft="81dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:visibility="visible"
+            app:np_dividerColor="@android:color/holo_orange_dark"
+            app:np_height="180dp"
+            app:np_max="12"
+            app:np_min="1"
+            app:np_selectedTextColor="@android:color/holo_orange_dark"
+            app:np_value="1"
+            app:np_width="64dp" />
+    </RelativeLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

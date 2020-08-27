@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
             dbHelper = new DbHelper(this, this);
         }
         checkWorkout();
-
         dbHelper.showAll();
 
         achievementsImageView.setOnClickListener(view -> {

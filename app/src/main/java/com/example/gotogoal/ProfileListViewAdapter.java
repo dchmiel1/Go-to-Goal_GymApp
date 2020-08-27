@@ -13,11 +13,13 @@ public class ProfileListViewAdapter extends BaseAdapter {
     private String[] titles;
     private String[] answers;
     private LayoutInflater inflater;
+    private String[] units;
 
-    public ProfileListViewAdapter(Context c, String[] titles, String[] answers){
+    public ProfileListViewAdapter(Context c, String[] titles, String[] answers, String[] units){
         this.titles = titles;
         this.answers = answers;
         this.inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.units = units;
     }
     @Override
     public int getCount() {
@@ -39,7 +41,7 @@ public class ProfileListViewAdapter extends BaseAdapter {
         View v = inflater.inflate(R.layout.profile_list_view, null);
 
         ((TextView) v.findViewById(R.id.titleTextView)).setText(titles[i]);
-        ((TextView) v.findViewById(R.id.answerTextView)).setText(answers[i]);
+        ((TextView) v.findViewById(R.id.answerTextView)).setText(answers[i] + units[i]);
 
         return v;
     }

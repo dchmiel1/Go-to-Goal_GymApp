@@ -43,7 +43,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public void insertSet (String exName, int reps, double kgAdded) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(DbNames.COLUMN_NAME_DATE, new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(MainActivity.date));
+        values.put(DbNames.COLUMN_NAME_DATE, new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(MainActivity.date));
         values.put(DbNames.COLUMN_NAME_EXERCISE, exName);
         values.put(DbNames.COLUMN_NAME_REPS, reps);
         values.put(DbNames.COLUMN_NAME_KG_ADDED, kgAdded);
@@ -60,7 +60,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public void insertWeight(double kgs){
         SQLiteDatabase db = this.getWritableDatabase();
-        String date = new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(new Date());
+        String date = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(new Date());
         if(isWeightThatDate(date)) {
             ContentValues values = new ContentValues();
             values.put(DbNames.COLUMN_NAME_DATE, date);
@@ -73,6 +73,35 @@ public class DbHelper extends SQLiteOpenHelper {
         else{
             MainActivity.date = new Date();
             insertSet("weight", 0, kgs);
+        }
+    }
+
+    public void updateProfileInfo(int sex, String dateOfBirth, int height, double weight, BodyWeightActivity.WhichPicker whichPicker){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        if(getProfileInfo().getCount() == 0){
+            values.put(DbNames.COLUMN_NAME_DATE, dateOfBirth);
+            values.put(DbNames.COLUMN_NAME_EXERCISE, "profile_info");
+            values.put(DbNames.COLUMN_NAME_REPS, height);
+            values.put(DbNames.COLUMN_NAME_KG_ADDED, weight);
+            values.put(DbNames.COLUMN_NAME_ONE_REP, sex);
+            db.insert(DbNames.TABLE_NAME, null, values);
+        }else{
+            switch(whichPicker) {
+                case SEX:
+                    values.put(DbNames.COLUMN_NAME_ONE_REP, sex);
+                    break;
+                case BIRTHDAY:
+                    values.put(DbNames.COLUMN_NAME_DATE, dateOfBirth);
+                    break;
+                case HEIGHT:
+                    values.put(DbNames.COLUMN_NAME_REPS, height);
+                    break;
+                default:
+                    values.put(DbNames.COLUMN_NAME_KG_ADDED, weight);
+                    break;
+            }
+            db.update(DbNames.TABLE_NAME, values, "exercise = ?", new String[] {"profile_info"});
         }
     }
 
@@ -195,7 +224,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public void deleteByDateAndExercise(String exName){
         SQLiteDatabase db = this.getWritableDatabase();
-        String date = new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(MainActivity.date);
+        String date = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(MainActivity.date);
         db.delete("sets_table",
                 " exercise = ? AND date = ?",
                 new String[] { exName, date });
