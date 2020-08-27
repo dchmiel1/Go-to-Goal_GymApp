@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     public static DbHelper dbHelper;
     private TextView emptyTextView;
     private ListView workoutLayout;
-    private ImageView deleteImageView;
     private LayoutInflater inflater;
     private WorkoutAdapter workoutAdapter;
     public static int multiplier[];
@@ -131,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkWorkout(){
-        String dateString = new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(date);
+        String dateString = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(date);
         Cursor c2 = dbHelper.getExercisesByDate(dateString);
         int howMany = c2.getCount();
         Structure[] structures = new Structure[howMany];

@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
@@ -36,6 +38,7 @@ public class BodyWeightActivity extends AppCompatActivity {
     private int numOfPoints;
     private PointsGraphSeries<DataPoint> pointsGraphSeries;
     private LineGraphSeries<DataPoint> lineGraphSeries;
+    private boolean graphVisible;
 
     //profile items
     private ListView profileListView;
@@ -54,6 +57,8 @@ public class BodyWeightActivity extends AppCompatActivity {
     private ImageButton addWeightImageButton;
     private NumberPicker weightPicker1;
     private NumberPicker weightPicker2;
+    private TextView dataPointDetails;
+    private TextView notEnoughDataPointsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +79,8 @@ public class BodyWeightActivity extends AppCompatActivity {
         pickersLayout = (RelativeLayout) findViewById(R.id.pickersLayout);
         darkView = (View) findViewById(R.id.darkView);
         datePickersLayout = (RelativeLayout) findViewById(R.id.datePickersLayout);
+        dataPointDetails = (TextView) findViewById(R.id.dataPointDetails);
+        notEnoughDataPointsTextView = (TextView) findViewById(R.id.notEnoughDataPointsTextView);
 
         whichPicker = null;
         datePickersLayout.setVisibility(View.GONE);
@@ -95,13 +102,24 @@ public class BodyWeightActivity extends AppCompatActivity {
                 }
             }
         });
-        if(lineGraphSeries != null) {
+        setGraphSeries();
+
+        if(graphVisible){
+           notEnoughDataPointsTextView.setVisibility(View.GONE);
+           dataPointDetails.setVisibility(View.GONE);
+        }
+        if(graphVisible) {
             weightGraph.addSeries(lineGraphSeries);
             weightGraph.addSeries(pointsGraphSeries);
             weightGraph.getGridLabelRenderer().setNumHorizontalLabels(numOfPoints);
         }
 
         setPickers();
+
+        if(graphVisible)
+            pointsGraphSeries.setOnDataPointTapListener((series, dataPoint) -> {
+                dataPointDetails.setText(dataPoint.getX() + ", "+ dataPoint.getY()+ "");
+            });
 
         navigationView.setOnNavigationItemSelectedListener(item -> {
             if(item.toString().equals("Body weight"))
@@ -142,8 +160,10 @@ public class BodyWeightActivity extends AppCompatActivity {
                         dbHelper.updateProfileInfo(0, null, 0, Double.parseDouble(newWeight), whichPicker);
                         weightGraph.removeAllSeries();
                         setGraphSeries();
-                        weightGraph.addSeries(lineGraphSeries);
-                        weightGraph.addSeries(pointsGraphSeries);
+                        if(graphVisible) {
+                            weightGraph.addSeries(lineGraphSeries);
+                            weightGraph.addSeries(pointsGraphSeries);
+                        }
                         break;
                     case SEX:
                         sexPicker.setVisibility(View.GONE);
@@ -157,6 +177,9 @@ public class BodyWeightActivity extends AppCompatActivity {
                         System.out.println(newDayOfBirth);
                         dbHelper.updateProfileInfo(0, newDayOfBirth, 0, 0, whichPicker);
                         break;
+                }
+                if(navigationView.getSelectedItemId() == R.id.profile_info){
+                    addWeightImageButton.setVisibility(View.GONE);
                 }
             }
             setAdapter();
@@ -210,7 +233,8 @@ public class BodyWeightActivity extends AppCompatActivity {
 
     private void setGraphSeries(){
         Cursor c = dbHelper.getWeightData();
-        if(c.getCount() > 0){
+        System.out.println(c.getCount());
+        if(c.getCount() > 1){
             DataPoint[] dataPoints = new DataPoint[c.getCount()];
             SimpleDateFormat formatOfDateInSql = new SimpleDateFormat("yyyy.MM.dd");
             int i = 0;
@@ -227,19 +251,32 @@ public class BodyWeightActivity extends AppCompatActivity {
             lineGraphSeries = new LineGraphSeries<>(dataPoints);
             pointsGraphSeries.setColor(Color.parseColor("#FFFF8800"));
             lineGraphSeries.setColor(Color.parseColor("#FFFF8800"));
-        }
+            notEnoughDataPointsTextView.setVisibility(View.GONE);
+            graphVisible = true;
+        }else
+            graphVisible = false;
     }
 
     private void showBodyWeight(){
         profileListView.setVisibility(View.GONE);
         weightGraph.setVisibility(View.VISIBLE);
         addWeightImageButton.setVisibility(View.VISIBLE);
+        if(graphVisible) {
+            notEnoughDataPointsTextView.setVisibility(View.GONE);
+            dataPointDetails.setVisibility(View.GONE);
+        }
+        else {
+            notEnoughDataPointsTextView.setVisibility(View.VISIBLE);
+            dataPointDetails.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showProfile(){
         profileListView.setVisibility(View.VISIBLE);
         weightGraph.setVisibility(View.GONE);
         addWeightImageButton.setVisibility(View.GONE);
+        notEnoughDataPointsTextView.setVisibility(View.GONE);
+        dataPointDetails.setVisibility(View.GONE);
     }
 
     private void setAdapter(){
@@ -256,6 +293,9 @@ public class BodyWeightActivity extends AppCompatActivity {
             answers[1] = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE));
             answers[2] = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS));
             answers[3] = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED));
+        }else{
+            for(int i = 0; i < answers.length; i ++)
+                answers[i] = "";
         }
         profileListViewAdapter = new ProfileListViewAdapter(this, titles, answers, units);
     }
