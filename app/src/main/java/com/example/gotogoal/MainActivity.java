@@ -120,11 +120,11 @@ public class MainActivity extends AppCompatActivity {
             dateTextView.setText(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
     }
 
-    public class Structure{
+    public static class Training {
         public String exercise;
         public String[] reps;
         public String[] kgs;
-        Structure(){
+        Training(){
 
         }
     }
@@ -133,10 +133,10 @@ public class MainActivity extends AppCompatActivity {
         String dateString = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(date);
         Cursor c2 = dbHelper.getExercisesByDate(dateString);
         int howMany = c2.getCount();
-        Structure[] structures = new Structure[howMany];
+        Training[] trainings = new Training[howMany];
 
         for(int k = 0; k < howMany; k++){
-            structures[k] = new Structure();
+            trainings[k] = new Training();
         }
 
         String[] exercises = new String[howMany];
@@ -147,22 +147,22 @@ public class MainActivity extends AppCompatActivity {
         int i = 0;
         while(c2.moveToNext()) {
             exercises[i] = c2.getString(c2.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE));
-            structures[i].exercise = exercises[i];
+            trainings[i].exercise = exercises[i];
             ++i;
         }
 
         for(int j = 0; j < howMany; j++) {
             Cursor c3 = dbHelper.getSetsByDateAndExercise(dateString, exercises[j]);
-            structures[j].reps = new String[c3.getCount()];
-            structures[j].kgs = new String[c3.getCount()];
+            trainings[j].reps = new String[c3.getCount()];
+            trainings[j].kgs = new String[c3.getCount()];
             int k = 0;
             while (c3.moveToNext()) {
-                structures[j].reps[k] = String.valueOf(c3.getInt(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
-                structures[j].kgs[k] = String.valueOf(c3.getDouble(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+                trainings[j].reps[k] = String.valueOf(c3.getInt(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
+                trainings[j].kgs[k] = String.valueOf(c3.getDouble(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
                 ++k;
             }
         }
-        workoutAdapter = new WorkoutAdapter(this, structures);
+        workoutAdapter = new WorkoutAdapter(this, trainings);
         workoutLayout.setAdapter(workoutAdapter);
     }
 

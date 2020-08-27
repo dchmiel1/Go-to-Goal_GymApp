@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -213,6 +214,34 @@ public class DbHelper extends SQLiteOpenHelper {
         return db.rawQuery("select " + DbNames.COLUMN_NAME_DATE + ", " + DbNames.COLUMN_NAME_KG_ADDED +
                             " from " + DbNames.TABLE_NAME +
                             " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight'", null);
+    }
+
+    public MainActivity.Training[] getExerciseHistory(String exercise){
+        SQLiteDatabase db = this.getReadableDatabase();
+        MainActivity.Training[] trainings;
+        Cursor howMany = db.rawQuery("select distinct " + DbNames.COLUMN_NAME_DATE + " from " + DbNames.TABLE_NAME + " where " + DbNames.COLUMN_NAME_EXERCISE + " = '" + exercise + "' " + " ORDER BY " + DbNames.COLUMN_NAME_DATE + " DESC", null);
+        trainings = new MainActivity.Training[howMany.getCount()];
+        for(int i = 0; i < trainings.length; i ++)
+            trainings[i] = new MainActivity.Training();
+        int i = 0;
+        while(howMany.moveToNext()){
+            trainings[i].exercise = howMany.getString(howMany.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE));
+            i++;
+        }
+
+        for(int j = 0; j < trainings.length; j++){
+            Cursor c = getSetsByDateAndExercise(trainings[j].exercise, exercise);
+            trainings[j].kgs = new String[c.getCount()];
+            trainings[j].reps = new String[c.getCount()];
+            i = 0;
+            while(c.moveToNext()){
+                trainings[j].kgs[i] = String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+                trainings[j].reps[i] = String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
+                i++;
+            }
+        }
+        return trainings;
+
     }
 
     public void deleteById (Integer id) {

@@ -8,7 +8,7 @@
     tools:context=".AchievementsActivity">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/navigationBar"
+        android:id="@+id/exerciseTrackingNavigationBar"
         android:layout_width="412dp"
         android:layout_height="48dp"
         android:background="#393737"
@@ -25,7 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:menu="@menu/navigation_bar" />
+        app:menu="@menu/achievements_navigation_bar" />
 
     <TextView
         android:id="@+id/textView5"

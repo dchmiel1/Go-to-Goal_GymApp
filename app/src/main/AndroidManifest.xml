@@ -13,7 +13,7 @@
             android:name=".AchievementsActivity"
             android:label="Achievements" />
         <activity
-            android:name=".RepsAndKgsActivity"
+            android:name=".WorkoutTrackActivity"
             android:label="Workout tracking"
             android:windowSoftInputMode="adjustPan" />
         <activity

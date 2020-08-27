@@ -54,7 +54,7 @@ public class ExercisesActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent showRepsAndKgsActivity = new Intent(getApplicationContext(), RepsAndKgsActivity.class);
+                Intent showRepsAndKgsActivity = new Intent(getApplicationContext(), WorkoutTrackActivity.class);
                 showRepsAndKgsActivity.putExtra("ex_name", listView.getItemAtPosition(i).toString());
                 startActivity(showRepsAndKgsActivity);
             }

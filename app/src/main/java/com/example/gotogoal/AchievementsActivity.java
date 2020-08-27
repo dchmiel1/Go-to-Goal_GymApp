@@ -26,7 +26,7 @@ public class AchievementsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_achievements);
 
         dbHelper = MainActivity.dbHelper;
-        BottomNavigationView navigationView = (BottomNavigationView) findViewById(R.id.navigationBar);
+        BottomNavigationView navigationView = (BottomNavigationView) findViewById(R.id.exerciseTrackingNavigationBar);
         benchPressTextView = (TextView) findViewById(R.id.oneRepBenchPress);
         squatTextView = (TextView) findViewById(R.id.oneRepSquat);
         deadliftTextView = (TextView) findViewById(R.id.oneRepDeadlift);

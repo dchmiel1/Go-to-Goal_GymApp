@@ -13,10 +13,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class RepsAndKgsActivity extends AppCompatActivity{
+public class WorkoutTrackActivity extends AppCompatActivity{
 
     private int newSets = 1;
     private LayoutInflater inflater;
@@ -24,23 +26,44 @@ public class RepsAndKgsActivity extends AppCompatActivity{
     private String exName;
     private ListView setsListView;
     private int[] idsToUpdate;
+    private BottomNavigationView navigationView;
+    private Button saveBtn;
+    private ListView historyListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reps_and_kgs);
+        setContentView(R.layout.activity_workout_track);
 
-        Button saveBtn = (Button) findViewById(R.id.saveButton);
-        final TextView exNameTextView = ((TextView) findViewById(R.id.exNameTextView));
+        WorkoutAdapter workoutAdapter;
 
+        saveBtn = (Button) findViewById(R.id.saveButton);
+        navigationView = (BottomNavigationView) findViewById(R.id.exerciseTrackingNavigationBar);
         setsListView = (ListView) findViewById(R.id.setsListView);
-        exName = getIntent().getExtras().getString("ex_name");
-        exNameTextView.setText(exName);
+        historyListView = (ListView) findViewById(R.id.historyListView);
         dbHelper = MainActivity.dbHelper;
         inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setsListView.setAdapter(new ArrayAdapter<String>(this, R.layout.set_listview, new String[0]));
 
+        exName = getIntent().getExtras().getString("ex_name");
+        setTitle(exName);
+        workoutAdapter = new WorkoutAdapter(this, dbHelper.getExerciseHistory(exName));
+        historyListView.setVisibility(View.GONE);
+        historyListView.setAdapter(workoutAdapter);
         idsToUpdate = display();
+
+        navigationView.setOnNavigationItemSelectedListener(item -> {
+            if(item.toString().equals("Track")){
+                setsListView.setVisibility(View.VISIBLE);
+                historyListView.setVisibility(View.GONE);
+                saveBtn.setVisibility(View.VISIBLE);
+            }else{
+                setsListView.setVisibility(View.GONE);
+                historyListView.setVisibility(View.VISIBLE);
+                saveBtn.setVisibility(View.GONE);
+            }
+            return true;
+        });
 
         setsListView.setOnItemClickListener((adapterView, view, i, l) -> {
                 setVisiblity(view);
@@ -104,7 +127,7 @@ public class RepsAndKgsActivity extends AppCompatActivity{
     private int[] display(){
         int i = 0;
         int[] ids;
-        Cursor c = dbHelper.getSetsByDateAndExercise(new SimpleDateFormat("yyyy MM dd", Locale.getDefault()).format(MainActivity.date), exName);
+        Cursor c = dbHelper.getSetsByDateAndExercise(new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(MainActivity.date), exName);
         ids = new int[c.getCount()];
         while(c.moveToNext()){
             ids[i] = c.getInt(c.getColumnIndexOrThrow(DbNames._ID));
