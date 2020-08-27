@@ -48,14 +48,7 @@ public class DbHelper extends SQLiteOpenHelper {
         values.put(DbNames.COLUMN_NAME_EXERCISE, exName);
         values.put(DbNames.COLUMN_NAME_REPS, reps);
         values.put(DbNames.COLUMN_NAME_KG_ADDED, kgAdded);
-        if(exName.equals("'Pull up'") || exName.equals("'Dip'") && reps <= 20) {
-            Cursor c = getLastWeight();
-            c.moveToNext();
-            values.put(DbNames.COLUMN_NAME_ONE_REP, ((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
-        }else if(reps <= 20)
-            values.put(DbNames.COLUMN_NAME_ONE_REP, kgAdded/((double)MainActivity.multiplier[reps]/100));
-        else
-            values.put(DbNames.COLUMN_NAME_ONE_REP, kgAdded);
+        values.put(DbNames.COLUMN_NAME_ONE_REP, calcOneRep(exName, reps, kgAdded));
         db.insert(DbNames.TABLE_NAME, null, values);
     }
 
@@ -111,14 +104,7 @@ public class DbHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(DbNames.COLUMN_NAME_REPS, reps);
         values.put(DbNames.COLUMN_NAME_KG_ADDED, kgs);
-        if(exName.equals("'Pull up'") || exName.equals("'Dip'") && reps <= 20) {
-            Cursor c = getLastWeight();
-            c.moveToNext();
-            values.put(DbNames.COLUMN_NAME_ONE_REP, ((kgs +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
-        }else if(reps <= 20)
-            values.put(DbNames.COLUMN_NAME_ONE_REP, kgs/((double)MainActivity.multiplier[reps]/100));
-        else
-            values.put(DbNames.COLUMN_NAME_ONE_REP, kgs);
+        values.put(DbNames.COLUMN_NAME_ONE_REP, calcOneRep(exName, reps, kgs));
         db.update(DbNames.TABLE_NAME, values, " _id = ?", new String[]{String.valueOf(id)});
     }
 
@@ -213,7 +199,8 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("select " + DbNames.COLUMN_NAME_DATE + ", " + DbNames.COLUMN_NAME_KG_ADDED +
                             " from " + DbNames.TABLE_NAME +
-                            " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight'", null);
+                            " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'weight' " +
+                            " order by " + DbNames.COLUMN_NAME_DATE + " ASC", null);
     }
 
     public MainActivity.Training[] getExerciseHistory(String exercise){
@@ -242,6 +229,15 @@ public class DbHelper extends SQLiteOpenHelper {
         }
         return trainings;
 
+    }
+
+    public Cursor getExerciseOneReps(String exercise){
+           SQLiteDatabase db = this.getReadableDatabase();
+           return db.rawQuery("select " + DbNames.COLUMN_NAME_DATE + ", " + "max(" + DbNames.COLUMN_NAME_ONE_REP + ")" +
+                                " from " + DbNames.TABLE_NAME +
+                                " where " + DbNames.COLUMN_NAME_EXERCISE + " = '" + exercise + "'" +
+                                " group by " + DbNames.COLUMN_NAME_DATE +
+                                " order by " + DbNames.COLUMN_NAME_DATE, null);
     }
 
     public void deleteById (Integer id) {
@@ -280,5 +276,16 @@ public class DbHelper extends SQLiteOpenHelper {
             System.out.println("reps: " + c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
             System.out.println("one_rep: " +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_ONE_REP)));
         }
+    }
+
+    private double calcOneRep(String exName, int reps, double kgAdded){
+        if(exName.equals("'Pull up'") || exName.equals("'Dip'") && reps <= 20) {
+            Cursor c = getLastWeight();
+            c.moveToNext();
+            return ((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED));
+        }else if(reps <= 20)
+            return kgAdded/((double)MainActivity.multiplier[reps]/100);
+        else
+            return kgAdded;
     }
 }

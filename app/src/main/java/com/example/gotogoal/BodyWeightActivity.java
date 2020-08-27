@@ -19,26 +19,24 @@ import com.jjoe64.graphview.series.PointsGraphSeries;
 import com.shawnlin.numberpicker.NumberPicker;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class BodyWeightActivity extends AppCompatActivity {
 
-    enum WhichPicker{ WEIGHT, HEIGHT, SEX, BIRTHDAY};
+    enum WhichPicker{ WEIGHT, HEIGHT, SEX, BIRTHDAY}
 
     private WhichPicker whichPicker;
     private DbHelper dbHelper;
     private SimpleDateFormat dateFormat;
     private BottomNavigationView navigationView;
     private String[] afterDecimal;
-    private String[] sexes;
     private String[] heights;
-    private String[] years;
     private String[] months;
     private String[] days;
-    private int numOfPoints;
-    private PointsGraphSeries<DataPoint> pointsGraphSeries;
-    private LineGraphSeries<DataPoint> lineGraphSeries;
-    private boolean graphVisible;
+    private boolean graphDataVisible;
 
     //profile items
     private ListView profileListView;
@@ -103,23 +101,7 @@ public class BodyWeightActivity extends AppCompatActivity {
             }
         });
         setGraphSeries();
-
-        if(graphVisible){
-           notEnoughDataPointsTextView.setVisibility(View.GONE);
-           dataPointDetails.setVisibility(View.GONE);
-        }
-        if(graphVisible) {
-            weightGraph.addSeries(lineGraphSeries);
-            weightGraph.addSeries(pointsGraphSeries);
-            weightGraph.getGridLabelRenderer().setNumHorizontalLabels(numOfPoints);
-        }
-
         setPickers();
-
-        if(graphVisible)
-            pointsGraphSeries.setOnDataPointTapListener((series, dataPoint) -> {
-                dataPointDetails.setText(dataPoint.getX() + ", "+ dataPoint.getY()+ "");
-            });
 
         navigationView.setOnNavigationItemSelectedListener(item -> {
             if(item.toString().equals("Body weight"))
@@ -147,7 +129,6 @@ public class BodyWeightActivity extends AppCompatActivity {
                     case HEIGHT:
                         heightPicker.setVisibility(View.GONE);
                         int newHeight = Integer.parseInt(heights[heightPicker.getValue()-1].substring(0, heights[heightPicker.getValue()].length()-3));
-                        System.out.println(newHeight);
                         dbHelper.updateProfileInfo(0, null, newHeight, 0, whichPicker);
                         break;
                     case WEIGHT:
@@ -155,26 +136,18 @@ public class BodyWeightActivity extends AppCompatActivity {
                         weightPicker2.setVisibility(View.GONE);
                         String newWeight = getProperVal(weightPicker1.getValue() +
                                 String.valueOf(afterDecimal[weightPicker2.getValue()-1]).substring(0, String.valueOf(afterDecimal[weightPicker2.getValue()]).length()-2));
-                        System.out.println(newWeight);
                         dbHelper.insertWeight(Double.parseDouble(newWeight));
                         dbHelper.updateProfileInfo(0, null, 0, Double.parseDouble(newWeight), whichPicker);
-                        weightGraph.removeAllSeries();
                         setGraphSeries();
-                        if(graphVisible) {
-                            weightGraph.addSeries(lineGraphSeries);
-                            weightGraph.addSeries(pointsGraphSeries);
-                        }
                         break;
                     case SEX:
                         sexPicker.setVisibility(View.GONE);
                         int newSex = sexPicker.getValue();
-                        System.out.println(newSex);
                         dbHelper.updateProfileInfo(newSex, null, 0, 0, whichPicker);
                         break;
                     default:
                         datePickersLayout.setVisibility(View.GONE);
                         String newDayOfBirth = datePicker3.getValue() + "." + months[datePicker2.getValue()-1] + "." + days[datePicker1.getValue()-1];
-                        System.out.println(newDayOfBirth);
                         dbHelper.updateProfileInfo(0, newDayOfBirth, 0, 0, whichPicker);
                         break;
                 }
@@ -233,10 +206,11 @@ public class BodyWeightActivity extends AppCompatActivity {
 
     private void setGraphSeries(){
         Cursor c = dbHelper.getWeightData();
-        System.out.println(c.getCount());
+        weightGraph.removeAllSeries();
         if(c.getCount() > 1){
             DataPoint[] dataPoints = new DataPoint[c.getCount()];
             SimpleDateFormat formatOfDateInSql = new SimpleDateFormat("yyyy.MM.dd");
+            SimpleDateFormat pointFormat = new SimpleDateFormat("dd MMM");
             int i = 0;
             while (c.moveToNext()) {
                 try {
@@ -246,28 +220,35 @@ public class BodyWeightActivity extends AppCompatActivity {
                 }
                 ++i;
             }
-            numOfPoints = dataPoints.length - 1;
-            pointsGraphSeries = new PointsGraphSeries<>(dataPoints);
-            lineGraphSeries = new LineGraphSeries<>(dataPoints);
+            PointsGraphSeries<DataPoint> pointsGraphSeries = new PointsGraphSeries<>(dataPoints);
+            LineGraphSeries<DataPoint> lineGraphSeries = new LineGraphSeries<>(dataPoints);
             pointsGraphSeries.setColor(Color.parseColor("#FFFF8800"));
             lineGraphSeries.setColor(Color.parseColor("#FFFF8800"));
             notEnoughDataPointsTextView.setVisibility(View.GONE);
-            graphVisible = true;
-        }else
-            graphVisible = false;
+            weightGraph.addSeries(lineGraphSeries);
+            weightGraph.addSeries(pointsGraphSeries);
+            weightGraph.getGridLabelRenderer().setHumanRounding(false);
+            graphDataVisible = true;
+            pointsGraphSeries.setOnDataPointTapListener((series, dataPoint) -> dataPointDetails.setText(getProperVal(String.valueOf(dataPoint.getY())) + ", " + pointFormat.format(new Date((long) dataPoint.getX()))));
+
+        }else {
+            if (weightGraph.getVisibility() == View.VISIBLE)
+                notEnoughDataPointsTextView.setVisibility(View.VISIBLE);
+            graphDataVisible = false;
+        }
     }
 
     private void showBodyWeight(){
         profileListView.setVisibility(View.GONE);
         weightGraph.setVisibility(View.VISIBLE);
         addWeightImageButton.setVisibility(View.VISIBLE);
-        if(graphVisible) {
+        if(graphDataVisible) {
             notEnoughDataPointsTextView.setVisibility(View.GONE);
-            dataPointDetails.setVisibility(View.GONE);
+            dataPointDetails.setVisibility(View.VISIBLE);
         }
         else {
             notEnoughDataPointsTextView.setVisibility(View.VISIBLE);
-            dataPointDetails.setVisibility(View.VISIBLE);
+            dataPointDetails.setVisibility(View.GONE);
         }
     }
 
@@ -294,16 +275,15 @@ public class BodyWeightActivity extends AppCompatActivity {
             answers[2] = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS));
             answers[3] = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED));
         }else{
-            for(int i = 0; i < answers.length; i ++)
-                answers[i] = "";
+            Arrays.fill(answers, "");
         }
         profileListViewAdapter = new ProfileListViewAdapter(this, titles, answers, units);
     }
 
     private void setPickers(){
         afterDecimal = new String[10];
-        sexes = new String[] {"male", "female"};
-        years = new String[100];
+        String[] sexes = new String[]{"male", "female"};
+        String[] years = new String[100];
         heights = new String[150];
         days = new String[31];
         months = new String[12];

@@ -15,6 +15,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView profileImageView = (ImageView) findViewById(R.id.profileImageView);
         ImageView addImageView = (ImageView) findViewById(R.id.addImageView);
         ImageView achievementsImageView = (ImageView) findViewById(R.id.achievementsImageView);
+        ImageView graphsImageView = (ImageView) findViewById(R.id.graphsImageView);
         final TextView dateTextView = (TextView) findViewById(R.id.dateTextView);
         ImageButton rightImageBtn = (ImageButton) findViewById(R.id.rightImageBtn);
         ImageButton leftImageBtn = (ImageButton) findViewById(R.id.leftImageBtn);
@@ -63,6 +65,11 @@ public class MainActivity extends AppCompatActivity {
         }
         checkWorkout();
         dbHelper.showAll();
+
+        graphsImageView.setOnClickListener(view -> {
+            Intent showGraphsActivityIntent = new Intent(getApplicationContext(), GraphsActivity.class);
+            startActivity(showGraphsActivityIntent);
+        });
 
         achievementsImageView.setOnClickListener(view -> {
             Intent showAchievementsIntent = new Intent(getApplicationContext(), AchievementsActivity.class);
@@ -125,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
         public String[] reps;
         public String[] kgs;
         Training(){
-
         }
     }
 
