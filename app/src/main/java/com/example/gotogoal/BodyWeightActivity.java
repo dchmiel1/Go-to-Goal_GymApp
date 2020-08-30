@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -15,14 +15,11 @@ import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.PointsGraphSeries;
 import com.shawnlin.numberpicker.NumberPicker;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 public class BodyWeightActivity extends AppCompatActivity {
 
@@ -52,7 +49,7 @@ public class BodyWeightActivity extends AppCompatActivity {
 
     //bodyWeight items
     private GraphView weightGraph;
-    private ImageButton addWeightImageButton;
+    private ImageView addWeightImageButton;
     private NumberPicker weightPicker1;
     private NumberPicker weightPicker2;
     private TextView dataPointDetails;
@@ -63,22 +60,22 @@ public class BodyWeightActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_body_weight);
 
-        profileListView = (ListView) findViewById(R.id.profileListView);
-        weightGraph = (GraphView) findViewById(R.id.weightGraph);
-        navigationView = (BottomNavigationView) findViewById(R.id.profileNavigationBar);
-        addWeightImageButton = (ImageButton) findViewById(R.id.addWeightImageButton);
-        weightPicker1 = (NumberPicker) findViewById(R.id.bodyWeightPicker1);
-        weightPicker2 = (NumberPicker) findViewById(R.id.bodyWeightPicker2);
-        sexPicker = (NumberPicker) findViewById(R.id.sexPicker);
-        heightPicker = (NumberPicker) findViewById(R.id.heightPicker);
-        datePicker1 = (NumberPicker) findViewById(R.id.datePicker1);
-        datePicker2 = (NumberPicker) findViewById(R.id.datePicker2);
-        datePicker3 = (NumberPicker) findViewById(R.id.datePicker3);
-        pickersLayout = (RelativeLayout) findViewById(R.id.pickersLayout);
-        darkView = (View) findViewById(R.id.darkView);
-        datePickersLayout = (RelativeLayout) findViewById(R.id.datePickersLayout);
-        dataPointDetails = (TextView) findViewById(R.id.dataPointDetails);
-        notEnoughDataPointsTextView = (TextView) findViewById(R.id.notEnoughDataPointsTextView);
+        profileListView = findViewById(R.id.profileListView);
+        weightGraph = findViewById(R.id.weightGraph);
+        navigationView = findViewById(R.id.profileNavigationBar);
+        addWeightImageButton = findViewById(R.id.addWeightImageButton);
+        weightPicker1 = findViewById(R.id.bodyWeightPicker1);
+        weightPicker2 = findViewById(R.id.bodyWeightPicker2);
+        sexPicker = findViewById(R.id.sexPicker);
+        heightPicker = findViewById(R.id.heightPicker);
+        datePicker1 = findViewById(R.id.datePicker1);
+        datePicker2 = findViewById(R.id.datePicker2);
+        datePicker3 = findViewById(R.id.datePicker3);
+        pickersLayout = findViewById(R.id.pickersLayout);
+        darkView = findViewById(R.id.darkView);
+        datePickersLayout = findViewById(R.id.datePickersLayout);
+        dataPointDetails = findViewById(R.id.dataPointDetails);
+        notEnoughDataPointsTextView = findViewById(R.id.notEnoughDataPointsTextView);
 
         whichPicker = null;
         datePickersLayout.setVisibility(View.GONE);
@@ -209,27 +206,30 @@ public class BodyWeightActivity extends AppCompatActivity {
         weightGraph.removeAllSeries();
         if(c.getCount() > 1){
             DataPoint[] dataPoints = new DataPoint[c.getCount()];
-            SimpleDateFormat formatOfDateInSql = new SimpleDateFormat("yyyy.MM.dd");
             SimpleDateFormat pointFormat = new SimpleDateFormat("dd MMM");
             int i = 0;
             while (c.moveToNext()) {
                 try {
-                    dataPoints[i] = new DataPoint(formatOfDateInSql.parse(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE))), c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+                    dataPoints[i] = new DataPoint(MainActivity.dateFormatInDb.parse(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE))), c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
                 ++i;
             }
-            PointsGraphSeries<DataPoint> pointsGraphSeries = new PointsGraphSeries<>(dataPoints);
             LineGraphSeries<DataPoint> lineGraphSeries = new LineGraphSeries<>(dataPoints);
-            pointsGraphSeries.setColor(Color.parseColor("#FFFF8800"));
             lineGraphSeries.setColor(Color.parseColor("#FFFF8800"));
+            lineGraphSeries.setDrawDataPoints(true);
             notEnoughDataPointsTextView.setVisibility(View.GONE);
-            weightGraph.addSeries(lineGraphSeries);
-            weightGraph.addSeries(pointsGraphSeries);
+            if(dataPoints.length > 5)
+                weightGraph.getGridLabelRenderer().setNumHorizontalLabels(6);
+            else
+                weightGraph.getGridLabelRenderer().setNumHorizontalLabels(dataPoints.length+1);
             weightGraph.getGridLabelRenderer().setHumanRounding(false);
+            weightGraph.addSeries(lineGraphSeries);
+            weightGraph.getViewport().setXAxisBoundsManual(true);
+            weightGraph.getViewport().setMaxX(dataPoints[dataPoints.length-1].getX());
             graphDataVisible = true;
-            pointsGraphSeries.setOnDataPointTapListener((series, dataPoint) -> dataPointDetails.setText(getProperVal(String.valueOf(dataPoint.getY())) + ", " + pointFormat.format(new Date((long) dataPoint.getX()))));
+            lineGraphSeries.setOnDataPointTapListener((series, dataPoint) -> dataPointDetails.setText(getProperVal(String.valueOf(dataPoint.getY())) + " kg, " + pointFormat.format(new Date((long) dataPoint.getX()))));
 
         }else {
             if (weightGraph.getVisibility() == View.VISIBLE)

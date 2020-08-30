@@ -26,13 +26,13 @@ public class AchievementsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_achievements);
 
         dbHelper = MainActivity.dbHelper;
-        BottomNavigationView navigationView = (BottomNavigationView) findViewById(R.id.exerciseTrackingNavigationBar);
-        benchPressTextView = (TextView) findViewById(R.id.oneRepBenchPress);
-        squatTextView = (TextView) findViewById(R.id.oneRepSquat);
-        deadliftTextView = (TextView) findViewById(R.id.oneRepDeadlift);
-        sumTextView = (TextView) findViewById(R.id.oneRepSum);
-        pullUpTextView = (TextView) findViewById(R.id.oneRepPullUp);
-        dipTextView = (TextView) findViewById(R.id.oneRepDip);
+        BottomNavigationView navigationView = findViewById(R.id.exerciseTrackingNavigationBar);
+        benchPressTextView = findViewById(R.id.oneRepBenchPress);
+        squatTextView = findViewById(R.id.oneRepSquat);
+        deadliftTextView = findViewById(R.id.oneRepDeadlift);
+        sumTextView = findViewById(R.id.oneRepSum);
+        pullUpTextView = findViewById(R.id.oneRepPullUp);
+        dipTextView = findViewById(R.id.oneRepDip);
         setValues(dbHelper::getBestRep);
 
         navigationView.setOnNavigationItemSelectedListener(item -> {

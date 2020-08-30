@@ -2,20 +2,18 @@ package com.example.gotogoal;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,9 +25,9 @@ public class MainActivity extends AppCompatActivity {
     public static DbHelper dbHelper;
     private TextView emptyTextView;
     private ListView workoutLayout;
-    private LayoutInflater inflater;
-    private WorkoutAdapter workoutAdapter;
-    public static int multiplier[];
+    public static int[] multiplier;
+    public static SimpleDateFormat dateFormatInDb;
+    private TextView dateTextView;
 
     @Override
     public Resources.Theme getTheme() {
@@ -44,21 +42,30 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        dateFormatInDb = new SimpleDateFormat("yyyy.MM.dd");
+        dateTextView = findViewById(R.id.dateTextView);
         multiplier = getResources().getIntArray(R.array.multipliers);
-        inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ImageView profileImageView = (ImageView) findViewById(R.id.profileImageView);
-        ImageView addImageView = (ImageView) findViewById(R.id.addImageView);
-        ImageView achievementsImageView = (ImageView) findViewById(R.id.achievementsImageView);
-        ImageView graphsImageView = (ImageView) findViewById(R.id.graphsImageView);
-        final TextView dateTextView = (TextView) findViewById(R.id.dateTextView);
-        ImageButton rightImageBtn = (ImageButton) findViewById(R.id.rightImageBtn);
-        ImageButton leftImageBtn = (ImageButton) findViewById(R.id.leftImageBtn);
-        workoutLayout = (ListView) findViewById(R.id.workoutListView);
+        ImageView profileImageView = findViewById(R.id.profileImageView);
+        ImageView addImageView = findViewById(R.id.addImageView);
+        ImageView achievementsImageView = findViewById(R.id.achievementsImageView);
+        ImageView graphsImageView = findViewById(R.id.graphsImageView);
+        ImageView rightImageBtn = findViewById(R.id.rightImageBtn);
+        ImageView leftImageBtn = findViewById(R.id.leftImageBtn);
+        workoutLayout = findViewById(R.id.workoutListView);
         final Animation slideLeftIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_in);
         final Animation slideRightIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_right_in);
-        emptyTextView = (TextView) findViewById(R.id.emptyTextView);
-        date = new Date();
-        dateTextView.setText("Today");
+        emptyTextView = findViewById(R.id.emptyTextView);
+        if(getIntent().hasExtra("date")) {
+            try {
+                date = dateFormatInDb.parse(getIntent().getExtras().getString("date"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            setDate();
+        }else {
+            date = new Date();
+            dateTextView.setText("Today");
+        }
 
         if(dbHelper == null) {
             dbHelper = new DbHelper(this, this);
@@ -89,19 +96,19 @@ public class MainActivity extends AppCompatActivity {
         rightImageBtn.setOnClickListener(view -> {
             setAnimation(slideLeftIn);
             date = new Date(date.getTime() + (1000 * 60 * 60 * 24));
-            setDate(dateTextView);
+            setDate();
             checkWorkout();
         });
 
         leftImageBtn.setOnClickListener(view -> {
             setAnimation(slideRightIn);
             date = new Date(date.getTime() - (1000 * 60 * 60 * 24));
-            setDate(dateTextView);
+            setDate();
             checkWorkout();
         });
     }
 
-    private void setDate(TextView dateTextView){
+    private void setDate(){
         Calendar c1 = Calendar.getInstance();
         Calendar c2 = Calendar.getInstance();
         c2.setTime(new Date());
@@ -136,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkWorkout(){
-        String dateString = new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(date);
+        String dateString = dateFormatInDb.format(date);
         Cursor c2 = dbHelper.getExercisesByDate(dateString);
         int howMany = c2.getCount();
         Training[] trainings = new Training[howMany];
@@ -168,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 ++k;
             }
         }
-        workoutAdapter = new WorkoutAdapter(this, trainings);
+        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, trainings);
         workoutLayout.setAdapter(workoutAdapter);
     }
 

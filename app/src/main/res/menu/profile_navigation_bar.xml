@@ -4,7 +4,7 @@
         android:id="@+id/body_weight"
         android:enabled="true"
         android:title="Body weight"
-        android:icon = "@drawable/plus2"/>
+        android:icon = "@drawable/graph2"/>
     <item
         android:id="@+id/profile_info"
         android:enabled="true"

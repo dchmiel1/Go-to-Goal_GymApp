@@ -113,11 +113,6 @@ public class DbHelper extends SQLiteOpenHelper {
         return db.rawQuery("select * from " + DbNames.TABLE_NAME + " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'profile_info'", null);
     }
 
-    public Cursor getById(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery( "select * from " + DbNames.TABLE_NAME + " where _id="+id+"", null );
-    }
-
     public Cursor getExercisesByDate(String date){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("select distinct " + DbNames.COLUMN_NAME_EXERCISE +
@@ -283,9 +278,9 @@ public class DbHelper extends SQLiteOpenHelper {
             Cursor c = getLastWeight();
             c.moveToNext();
             return ((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED));
-        }else if(reps <= 20)
+        }else if(reps <= MainActivity.multiplier.length-1)
             return kgAdded/((double)MainActivity.multiplier[reps]/100);
         else
-            return kgAdded;
+            return kgAdded/((double)MainActivity.multiplier[MainActivity.multiplier.length-1]/100);
     }
 }

@@ -51,16 +51,16 @@ public class WorkoutAdapter extends BaseAdapter{
     public View getView(int i, View view, ViewGroup viewGroup) {
         View v = inflater.inflate(R.layout.workout_listview, null);
 
-        TextView exNameTextView = (TextView) v.findViewById(R.id.exNameTextView);
-        ListView listView = (ListView) v.findViewById(R.id.setsListView);
-        ImageView deleteImageView = (ImageView) v.findViewById(R.id.deleteImageView);
-        View clickView = (View) v.findViewById(R.id.clickView);
+        TextView exNameTextView = v.findViewById(R.id.exNameTextView);
+        ListView listView = v.findViewById(R.id.setsListView);
+        ImageView deleteImageView = v.findViewById(R.id.deleteImageView);
+        View clickView = v.findViewById(R.id.clickView);
         if(c.getClass() == MainActivity.class) {
             clickView.setOnClickListener(view1 -> updateSets(i));
             clickView.setOnLongClickListener(view1 -> showDelete(v, i));
         }
 
-        RelativeLayout.LayoutParams mParam = new RelativeLayout.LayoutParams((int)(975),(int)(148 + 3 + 3 + trainings[i].reps.length * 126));
+        RelativeLayout.LayoutParams mParam = new RelativeLayout.LayoutParams(975, 148 + 3 + 3 + trainings[i].reps.length * 126);
         v.setLayoutParams(mParam);
         listView.setAdapter(new ArrayAdapter<>(c, R.layout.exercise_in_workout_listview, new String[0]));
         deleteImageView.setOnClickListener(view1 -> dbHelper.deleteByDateAndExercise(trainings[i].exercise));
@@ -74,8 +74,8 @@ public class WorkoutAdapter extends BaseAdapter{
 
     private View newListViewItem(String reps, String kgs){
         View v = inflater.inflate(R.layout.exercise_in_workout_listview, null);
-        TextView repsTextView = (TextView) v.findViewById(R.id.repsTextView);
-        TextView kgsTextView = (TextView) v.findViewById(R.id.kgsTextView);
+        TextView repsTextView = v.findViewById(R.id.repsTextView);
+        TextView kgsTextView = v.findViewById(R.id.kgsTextView);
         repsTextView.setText(BodyWeightActivity.getProperVal(reps));
         kgsTextView.setText(BodyWeightActivity.getProperVal(kgs));
         return v;
@@ -89,16 +89,16 @@ public class WorkoutAdapter extends BaseAdapter{
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private boolean showDelete(View v, int i){
-        ((ImageView) v.findViewById(R.id.deleteImageView)).setVisibility(VISIBLE);
-        ((View) v.findViewById(R.id.clickView)).setOnClickListener(view -> hideDelete(v, i));
+        v.findViewById(R.id.deleteImageView).setVisibility(VISIBLE);
+        v.findViewById(R.id.clickView).setOnClickListener(view -> hideDelete(v, i));
         v.setBackgroundColor(Color.parseColor("#9C9691"));
         return true;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void hideDelete(View v, int i){
-        ((ImageView) v.findViewById(R.id.deleteImageView)).setVisibility(View.GONE);
-        ((View) v.findViewById(R.id.clickView)).setOnClickListener(view -> updateSets(i));
+        v.findViewById(R.id.deleteImageView).setVisibility(View.GONE);
+        v.findViewById(R.id.clickView).setOnClickListener(view -> updateSets(i));
         v.setBackground(c.getResources().getDrawable(R.drawable.border_dark_orange, null));
     }
 

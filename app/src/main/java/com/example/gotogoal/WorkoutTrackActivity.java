@@ -26,7 +26,6 @@ public class WorkoutTrackActivity extends AppCompatActivity{
     private String exName;
     private ListView setsListView;
     private int[] idsToUpdate;
-    private BottomNavigationView navigationView;
     private Button saveBtn;
     private ListView historyListView;
 
@@ -37,13 +36,13 @@ public class WorkoutTrackActivity extends AppCompatActivity{
 
         WorkoutAdapter workoutAdapter;
 
-        saveBtn = (Button) findViewById(R.id.saveButton);
-        navigationView = (BottomNavigationView) findViewById(R.id.exerciseTrackingNavigationBar);
-        setsListView = (ListView) findViewById(R.id.setsListView);
-        historyListView = (ListView) findViewById(R.id.historyListView);
+        saveBtn = findViewById(R.id.saveButton);
+        BottomNavigationView navigationView = findViewById(R.id.exerciseTrackingNavigationBar);
+        setsListView = findViewById(R.id.setsListView);
+        historyListView = findViewById(R.id.historyListView);
         dbHelper = MainActivity.dbHelper;
         inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        setsListView.setAdapter(new ArrayAdapter<String>(this, R.layout.set_listview, new String[0]));
+        setsListView.setAdapter(new ArrayAdapter<>(this, R.layout.set_listview, new String[0]));
 
         exName = getIntent().getExtras().getString("ex_name");
         setTitle(exName);
@@ -93,26 +92,27 @@ public class WorkoutTrackActivity extends AppCompatActivity{
                     dbHelper.insertSet(exName, Integer.parseInt(reps), Double.parseDouble(kgs));
                 }
             }
+            mainActivityIntent.putExtra("date", MainActivity.dateFormatInDb.format(MainActivity.date));
             startActivity(mainActivityIntent);
         });
     }
 
     private View getNewSetView(int i){
         View v = inflater.inflate(R.layout.set_listview, null);
-        ((EditText) v.findViewById(R.id.repsEditText)).setVisibility(View.GONE);
-        ((EditText) v.findViewById(R.id.kgsEditText)).setVisibility(View.GONE);
-        ((TextView) v.findViewById(R.id.repsTextView)).setVisibility(View.GONE);
-        ((TextView) v.findViewById(R.id.kgsTextView)).setVisibility(View.GONE);
+        v.findViewById(R.id.repsEditText).setVisibility(View.GONE);
+        v.findViewById(R.id.kgsEditText).setVisibility(View.GONE);
+        v.findViewById(R.id.repsTextView).setVisibility(View.GONE);
+        v.findViewById(R.id.kgsTextView).setVisibility(View.GONE);
         ((TextView) v.findViewById(R.id.numOfSetTextView)).setText(i+2+"");
         return v;
     }
 
     private void setVisiblity(View v){
-        ((EditText) v.findViewById(R.id.repsEditText)).setVisibility(View.VISIBLE);
-        ((EditText) v.findViewById(R.id.kgsEditText)).setVisibility(View.VISIBLE);
-        ((TextView) v.findViewById(R.id.plus)).setVisibility(View.GONE);
-        ((TextView) v.findViewById(R.id.repsTextView)).setVisibility(View.VISIBLE);
-        ((TextView) v.findViewById(R.id.kgsTextView)).setVisibility(View.VISIBLE);
+        v.findViewById(R.id.repsEditText).setVisibility(View.VISIBLE);
+        v.findViewById(R.id.kgsEditText).setVisibility(View.VISIBLE);
+        v.findViewById(R.id.plus).setVisibility(View.GONE);
+        v.findViewById(R.id.repsTextView).setVisibility(View.VISIBLE);
+        v.findViewById(R.id.kgsTextView).setVisibility(View.VISIBLE);
     }
 
     private View getSetView(int i, int reps, double kgs){
@@ -120,7 +120,7 @@ public class WorkoutTrackActivity extends AppCompatActivity{
         ((TextView) v.findViewById(R.id.numOfSetTextView)).setText(i+"");
         ((EditText) v.findViewById(R.id.repsEditText)).setText(reps + "");
         ((EditText) v.findViewById(R.id.kgsEditText)).setText(BodyWeightActivity.getProperVal(String.valueOf(kgs)));
-        ((TextView) v.findViewById(R.id.plus)).setVisibility(View.GONE);
+        v.findViewById(R.id.plus).setVisibility(View.GONE);
         return v;
     }
 
