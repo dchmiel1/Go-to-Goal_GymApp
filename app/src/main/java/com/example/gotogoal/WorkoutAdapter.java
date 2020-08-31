@@ -51,6 +51,7 @@ public class WorkoutAdapter extends BaseAdapter{
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+        long start = System.currentTimeMillis();
 
         View v = inflater.inflate(R.layout.workout_listview, null);
 
@@ -65,28 +66,15 @@ public class WorkoutAdapter extends BaseAdapter{
             clickView.setOnLongClickListener(view1 -> showDelete(v, i));
         }
 
-        listView.setAdapter(new ArrayAdapter<>(c, R.layout.exercise_in_workout_listview, new String[0]));
+        WorkoutSetAdapter workoutSetAdapter = new WorkoutSetAdapter(c, trainings.elementAt(i).reps, trainings.elementAt(i).kgs);
+        listView.setAdapter(workoutSetAdapter);
         deleteImageView.setOnClickListener(view1 -> dbHelper.deleteByDateAndExercise(trainings.elementAt(i).exercise));
-
-        for(int j = 0; j < trainings.elementAt(i).reps.size(); j ++)
-            listView.addFooterView(newListViewItem(trainings.elementAt(i).reps.elementAt(j), trainings.elementAt(i).kgs.elementAt(j)));
 
         ConstraintLayout.LayoutParams mParam = new ConstraintLayout.LayoutParams(-1, (int)(exNameTextView.getTextSize()*1.9) + (int)(exNameTextView.getTextSize() *(1.85* trainings.elementAt(i).reps.size())));
         v.setLayoutParams(mParam);
-
-        return v;
-    }
-
-    private View newListViewItem(String reps, String kgs){
-        long start = System.currentTimeMillis();
-        View v = inflater.inflate(R.layout.exercise_in_workout_listview, null);
         long finish = System.currentTimeMillis();
         long timeElapsed = finish - start;
         System.out.println(timeElapsed);
-        TextView repsTextView = v.findViewById(R.id.repsTextView);
-        TextView kgsTextView = v.findViewById(R.id.kgsTextView);
-        repsTextView.setText(BodyWeightActivity.getProperVal(reps));
-        kgsTextView.setText(BodyWeightActivity.getProperVal(kgs));
         return v;
     }
 

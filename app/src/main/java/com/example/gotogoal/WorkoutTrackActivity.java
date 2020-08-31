@@ -65,9 +65,11 @@ public class WorkoutTrackActivity extends AppCompatActivity{
         });
 
         setsListView.setOnItemClickListener((adapterView, view, i, l) -> {
-                setVisiblity(view);
-                setsListView.addFooterView(getNewSetView(i));
-                ++newSets;
+                if(idsToUpdate.length + newSets < 7) {
+                    setVisiblity(view);
+                    setsListView.addFooterView(getNewSetView(i));
+                    ++newSets;
+                }
         });
 
         saveBtn.setOnClickListener(view -> {
@@ -84,12 +86,14 @@ public class WorkoutTrackActivity extends AppCompatActivity{
                     dbHelper.deleteById(idsToUpdate[i]);
                 }
             }
-            for(int i = idsToUpdate.length; i < idsToUpdate.length + newSets; i ++){
+            for(int i = idsToUpdate.length; i < idsToUpdate.length + newSets; i ++) {
                 View v = setsListView.getChildAt(i);
-                String reps = ((EditText) v.findViewById(R.id.repsEditText)).getText().toString();
-                String kgs = ((EditText) v.findViewById(R.id.kgsEditText)).getText().toString();
-                if(!reps.equals("") && !kgs.equals("")){
-                    dbHelper.insertSet(exName, Integer.parseInt(reps), Double.parseDouble(kgs));
+                if (v != null){
+                    String reps = ((EditText) v.findViewById(R.id.repsEditText)).getText().toString();
+                    String kgs = ((EditText) v.findViewById(R.id.kgsEditText)).getText().toString();
+                    if (!reps.equals("") && !kgs.equals("")) {
+                        dbHelper.insertSet(exName, Integer.parseInt(reps), Double.parseDouble(kgs));
+                    }
                 }
             }
             mainActivityIntent.putExtra("date", MainActivity.dateFormatInDb.format(MainActivity.date));
