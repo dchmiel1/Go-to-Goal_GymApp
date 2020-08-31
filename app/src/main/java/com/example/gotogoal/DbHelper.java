@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Vector;
 
 public class DbHelper extends SQLiteOpenHelper {
 
@@ -113,12 +114,11 @@ public class DbHelper extends SQLiteOpenHelper {
         return db.rawQuery("select * from " + DbNames.TABLE_NAME + " where " + DbNames.COLUMN_NAME_EXERCISE + " = 'profile_info'", null);
     }
 
-    public Cursor getExercisesByDate(String date){
+    public Cursor getSetsByDate(){
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("select distinct " + DbNames.COLUMN_NAME_EXERCISE +
-                        " from " + DbNames.TABLE_NAME +
-                        " where date =" + "'" + date + "'" + " and " + DbNames.COLUMN_NAME_EXERCISE + " != 'weight'"
-                , null);
+        return db.rawQuery("select " + DbNames.COLUMN_NAME_EXERCISE + ", " + DbNames.COLUMN_NAME_KG_ADDED + ", " + DbNames.COLUMN_NAME_REPS +
+                            " from " + DbNames.TABLE_NAME +
+                            " where " + DbNames.COLUMN_NAME_DATE + " =  '" + MainActivity.dateFormatInDb.format(MainActivity.date) + "' and " + DbNames.COLUMN_NAME_EXERCISE + " != 'weight'", null);
     }
 
     public Cursor getSetsByDateAndExercise(String date, String exercise){
@@ -198,29 +198,34 @@ public class DbHelper extends SQLiteOpenHelper {
                             " order by " + DbNames.COLUMN_NAME_DATE + " ASC", null);
     }
 
-    public MainActivity.Training[] getExerciseHistory(String exercise){
+    public Vector<MainActivity.Training> getExerciseHistory(String exercise){
         SQLiteDatabase db = this.getReadableDatabase();
-        MainActivity.Training[] trainings;
-        Cursor howMany = db.rawQuery("select distinct " + DbNames.COLUMN_NAME_DATE + " from " + DbNames.TABLE_NAME + " where " + DbNames.COLUMN_NAME_EXERCISE + " = '" + exercise + "' " + " ORDER BY " + DbNames.COLUMN_NAME_DATE + " DESC", null);
-        trainings = new MainActivity.Training[howMany.getCount()];
-        for(int i = 0; i < trainings.length; i ++)
-            trainings[i] = new MainActivity.Training();
-        int i = 0;
-        while(howMany.moveToNext()){
-            trainings[i].exercise = howMany.getString(howMany.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE));
-            i++;
-        }
+        Vector<MainActivity.Training> trainings = new Vector<>();
+        MainActivity.Training training;
+        boolean found = false;
 
-        for(int j = 0; j < trainings.length; j++){
-            Cursor c = getSetsByDateAndExercise(trainings[j].exercise, exercise);
-            trainings[j].kgs = new String[c.getCount()];
-            trainings[j].reps = new String[c.getCount()];
-            i = 0;
-            while(c.moveToNext()){
-                trainings[j].kgs[i] = String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
-                trainings[j].reps[i] = String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
-                i++;
+        Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_DATE + ", " + DbNames.COLUMN_NAME_REPS + ", " + DbNames.COLUMN_NAME_KG_ADDED +
+                                    " from " + DbNames.TABLE_NAME +
+                                    " where " + DbNames.COLUMN_NAME_EXERCISE + " = '" + exercise + "'" +
+                                    " order by " + DbNames.COLUMN_NAME_DATE + " desc ", null);
+        while(c.moveToNext()){
+            for(int i = 0; i < trainings.size(); i ++)
+                if(trainings.elementAt(i).exercise.equals(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE)))){
+                    trainings.elementAt(i).reps.add(String.valueOf(c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS))));
+                    trainings.elementAt(i).kgs.add(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))));
+                    found = true;
+                }
+            if(found){
+                found = false;
+                continue;
             }
+            training = new MainActivity.Training();
+            training.exercise = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE));
+            training.kgs = new Vector<>();
+            training.reps = new Vector<>();
+            training.reps.add(String.valueOf(c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS))));
+            training.kgs.add(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))));
+            trainings.add(training);
         }
         return trainings;
 

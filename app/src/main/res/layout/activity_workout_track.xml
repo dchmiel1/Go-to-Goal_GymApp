@@ -36,7 +36,7 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/exerciseTrackingNavigationBar"
-        android:layout_width="412dp"
+        android:layout_width="0dp"
         android:layout_height="48dp"
         android:background="#393737"
         android:clipChildren="true"

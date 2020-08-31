@@ -7,8 +7,11 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -136,48 +140,45 @@ public class MainActivity extends AppCompatActivity {
 
     public static class Training {
         public String exercise;
-        public String[] reps;
-        public String[] kgs;
+        public Vector<String> reps;
+        public Vector<String> kgs;
         Training(){
         }
     }
 
     public void checkWorkout(){
-        String dateString = dateFormatInDb.format(date);
-        Cursor c2 = dbHelper.getExercisesByDate(dateString);
-        int howMany = c2.getCount();
-        Training[] trainings = new Training[howMany];
+        Cursor c = dbHelper.getSetsByDate();
+        Vector<Training> trainings = new Vector<>();
+        boolean found = false;
+        Training training;
+        while(c.moveToNext()){
+            for(int i = 0; i < trainings.size(); i ++)
+                if (trainings.elementAt(i).exercise.equals(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE)))) {
+                    trainings.elementAt(i).reps.add(String.valueOf(c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS))));
+                    trainings.elementAt(i).kgs.add(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))));
+                    found = true;
+                }
+                if(found) {
+                    found = false;
+                    continue;
+                }
+                training = new Training();
+                training.exercise = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE));
+                training.reps = new Vector<>();
+                training.kgs = new Vector<>();
+                training.reps.add(String.valueOf(c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS))));
+                training.kgs.add(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))));
+                trainings.add(training);
+            }
 
-        for(int k = 0; k < howMany; k++){
-            trainings[k] = new Training();
-        }
-
-        String[] exercises = new String[howMany];
-        if(howMany == 0)
+        if(trainings.size() == 0)
             emptyTextView.setText("Workout is empty");
         else
             emptyTextView.setText("");
-        int i = 0;
-        while(c2.moveToNext()) {
-            exercises[i] = c2.getString(c2.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE));
-            trainings[i].exercise = exercises[i];
-            ++i;
-        }
 
-        for(int j = 0; j < howMany; j++) {
-            Cursor c3 = dbHelper.getSetsByDateAndExercise(dateString, exercises[j]);
-            trainings[j].reps = new String[c3.getCount()];
-            trainings[j].kgs = new String[c3.getCount()];
-            int k = 0;
-            while (c3.moveToNext()) {
-                trainings[j].reps[k] = String.valueOf(c3.getInt(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)));
-                trainings[j].kgs[k] = String.valueOf(c3.getDouble(c3.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
-                ++k;
-            }
-        }
         WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, trainings);
         workoutLayout.setAdapter(workoutAdapter);
-    }
+        }
 
     private void setAnimation(Animation anim){
         workoutLayout.startAnimation(anim);

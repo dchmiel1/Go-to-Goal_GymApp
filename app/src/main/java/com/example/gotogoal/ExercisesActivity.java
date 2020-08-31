@@ -35,14 +35,14 @@ public class ExercisesActivity extends AppCompatActivity {
                     case "Triceps":
                         exercises = res.getStringArray(R.array.triceps_ex);
                         break;
-                    case "Legs":
-                        exercises = res.getStringArray(R.array.legs_ex);
+                    case "Thighs":
+                        exercises = res.getStringArray(R.array.thighs_ex);
                         break;
                     case "ABS":
                         exercises = res.getStringArray(R.array.abs_ex);
                         break;
                     default:
-                        exercises = res.getStringArray(R.array.buttocks_ex);
+                        exercises = res.getStringArray(R.array.calves_ex);
                         break;
                 }
         }

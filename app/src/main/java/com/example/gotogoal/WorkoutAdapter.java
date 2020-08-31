@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,17 +15,20 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import java.util.Vector;
 
 import static android.view.View.VISIBLE;
 
 public class WorkoutAdapter extends BaseAdapter{
 
-    LayoutInflater inflater;
-    MainActivity.Training[] trainings;
-    Context c;
-    DbHelper dbHelper;
+    private LayoutInflater inflater;
+    private Vector<MainActivity.Training> trainings;
+    private Context c;
+    private DbHelper dbHelper;
 
-    public WorkoutAdapter(Context c, MainActivity.Training[] trainings){
+    public WorkoutAdapter(Context c, Vector<MainActivity.Training> trainings){
         this.trainings = trainings;
         this.c = c;
         this.inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -33,18 +37,16 @@ public class WorkoutAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return trainings.length;
+        return trainings.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return trainings[i];
+        return trainings.elementAt(i);
     }
 
     @Override
-    public long getItemId(int i) {
-        return 0;
-    }
+    public long getItemId(int i) { return 0; }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -60,14 +62,17 @@ public class WorkoutAdapter extends BaseAdapter{
             clickView.setOnLongClickListener(view1 -> showDelete(v, i));
         }
 
-        RelativeLayout.LayoutParams mParam = new RelativeLayout.LayoutParams(975, 148 + 3 + 3 + trainings[i].reps.length * 126);
-        v.setLayoutParams(mParam);
-        listView.setAdapter(new ArrayAdapter<>(c, R.layout.exercise_in_workout_listview, new String[0]));
-        deleteImageView.setOnClickListener(view1 -> dbHelper.deleteByDateAndExercise(trainings[i].exercise));
 
-        for(int j = 0; j < trainings[i].reps.length; j ++)
-            listView.addFooterView(newListViewItem(trainings[i].reps[j], trainings[i].kgs[j]));
-        exNameTextView.setText(trainings[i].exercise);
+
+        listView.setAdapter(new ArrayAdapter<>(c, R.layout.exercise_in_workout_listview, new String[0]));
+        deleteImageView.setOnClickListener(view1 -> dbHelper.deleteByDateAndExercise(trainings.elementAt(i).exercise));
+
+        for(int j = 0; j < trainings.elementAt(i).reps.size(); j ++)
+            listView.addFooterView(newListViewItem(trainings.elementAt(i).reps.elementAt(j), trainings.elementAt(i).kgs.elementAt(j)));
+        exNameTextView.setText(trainings.elementAt(i).exercise);
+
+        ConstraintLayout.LayoutParams mParam = new ConstraintLayout.LayoutParams(-1, (int)(exNameTextView.getTextSize()*1.9) + (int)(exNameTextView.getTextSize() *(1.85* trainings.elementAt(i).reps.size())));
+        v.setLayoutParams(mParam);
 
         return v;
     }
@@ -83,7 +88,7 @@ public class WorkoutAdapter extends BaseAdapter{
 
     public void updateSets(int i) {
         Intent showRepsAndKgsActivity = new Intent(c, WorkoutTrackActivity.class);
-        showRepsAndKgsActivity.putExtra("ex_name", trainings[i].exercise);
+        showRepsAndKgsActivity.putExtra("ex_name", trainings.elementAt(i).exercise);
         c.startActivity(showRepsAndKgsActivity);
     }
 

@@ -127,7 +127,7 @@ public class WorkoutTrackActivity extends AppCompatActivity{
     private int[] display(){
         int i = 0;
         int[] ids;
-        Cursor c = dbHelper.getSetsByDateAndExercise(new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(MainActivity.date), exName);
+        Cursor c = dbHelper.getSetsByDateAndExercise(MainActivity.dateFormatInDb.format(MainActivity.date), exName);
         ids = new int[c.getCount()];
         while(c.moveToNext()){
             ids[i] = c.getInt(c.getColumnIndexOrThrow(DbNames._ID));

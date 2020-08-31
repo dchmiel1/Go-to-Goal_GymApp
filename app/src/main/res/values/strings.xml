@@ -31,8 +31,8 @@
         <item>Shoulders</item>
         <item>Biceps</item>
         <item>Triceps</item>
-        <item>Legs</item>
-        <item>Buttocks</item>
+        <item>Thighs</item>
+        <item>Calves</item>
     </string-array>
 
     <string-array name="chest_ex">
@@ -86,7 +86,7 @@
         <item>Machine curl</item>
     </string-array>
 
-    <string-array name="legs_ex">
+    <string-array name="thighs_ex">
         <item>Barbell squat</item>
         <item>Sumo deadlift</item>
         <item>Dumbbell squat</item>
@@ -103,8 +103,10 @@
         <item>Side plank</item>
     </string-array>
 
-    <string-array name="buttocks_ex">
-        <item>lol</item>
+    <string-array name="calves_ex">
+        <item>Standing calf raise</item>
+        <item>Farmer’s walk on toes</item>
+        <item>Seated machine calves raise</item>
     </string-array>
 
     <string-array name="profile_list_view_titles">
