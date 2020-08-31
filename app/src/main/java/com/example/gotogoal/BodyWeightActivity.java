@@ -120,6 +120,7 @@ public class BodyWeightActivity extends AppCompatActivity {
             }else{
                 darkView.setVisibility(View.GONE);
                 pickersLayout.setVisibility(View.GONE);
+                addWeightImageButton.setImageResource(R.drawable.scale);
                 for(int i = 0; i < navigationView.getMenu().size(); i++)
                     navigationView.getMenu().getItem(i).setEnabled(true);
                 switch(whichPicker){
@@ -159,6 +160,7 @@ public class BodyWeightActivity extends AppCompatActivity {
         profileListView.setOnItemClickListener((adapterView, view, i, l) -> {
             pickersLayout.setVisibility(View.VISIBLE);
             darkView.setVisibility(View.VISIBLE);
+            addWeightImageButton.setImageResource(R.drawable.plus2);
             for(int j = 0; j < navigationView.getMenu().size(); j++)
                 navigationView.getMenu().getItem(j).setEnabled(false);
             addWeightImageButton.setVisibility(View.VISIBLE);

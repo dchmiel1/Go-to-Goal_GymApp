@@ -51,25 +51,25 @@ public class WorkoutAdapter extends BaseAdapter{
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+
         View v = inflater.inflate(R.layout.workout_listview, null);
 
         TextView exNameTextView = v.findViewById(R.id.exNameTextView);
         ListView listView = v.findViewById(R.id.setsListView);
         ImageView deleteImageView = v.findViewById(R.id.deleteImageView);
         View clickView = v.findViewById(R.id.clickView);
+        exNameTextView.setText(trainings.elementAt(i).exercise);
+
         if(c.getClass() == MainActivity.class) {
             clickView.setOnClickListener(view1 -> updateSets(i));
             clickView.setOnLongClickListener(view1 -> showDelete(v, i));
         }
-
-
 
         listView.setAdapter(new ArrayAdapter<>(c, R.layout.exercise_in_workout_listview, new String[0]));
         deleteImageView.setOnClickListener(view1 -> dbHelper.deleteByDateAndExercise(trainings.elementAt(i).exercise));
 
         for(int j = 0; j < trainings.elementAt(i).reps.size(); j ++)
             listView.addFooterView(newListViewItem(trainings.elementAt(i).reps.elementAt(j), trainings.elementAt(i).kgs.elementAt(j)));
-        exNameTextView.setText(trainings.elementAt(i).exercise);
 
         ConstraintLayout.LayoutParams mParam = new ConstraintLayout.LayoutParams(-1, (int)(exNameTextView.getTextSize()*1.9) + (int)(exNameTextView.getTextSize() *(1.85* trainings.elementAt(i).reps.size())));
         v.setLayoutParams(mParam);
@@ -78,7 +78,11 @@ public class WorkoutAdapter extends BaseAdapter{
     }
 
     private View newListViewItem(String reps, String kgs){
+        long start = System.currentTimeMillis();
         View v = inflater.inflate(R.layout.exercise_in_workout_listview, null);
+        long finish = System.currentTimeMillis();
+        long timeElapsed = finish - start;
+        System.out.println(timeElapsed);
         TextView repsTextView = v.findViewById(R.id.repsTextView);
         TextView kgsTextView = v.findViewById(R.id.kgsTextView);
         repsTextView.setText(BodyWeightActivity.getProperVal(reps));
