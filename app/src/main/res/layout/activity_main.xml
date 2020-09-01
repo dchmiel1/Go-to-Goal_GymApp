@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#9C9691"
+    android:background="#F8EAE1"
     android:theme="@style/AppThemeWithoutBar"
     tools:context=".MainActivity">
 
@@ -35,7 +35,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="88dp"
         android:text="Date"
-        android:textColor="@android:color/white"
         android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -93,8 +92,8 @@
         android:layout_marginTop="140dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-        android:background="#F8EAE1"
-        android:divider="#F8EAE1"
+        android:background="#FAF2ED"
+        android:divider="#FAF2ED"
         android:dividerHeight="10dp"
         android:nestedScrollingEnabled="false"
         android:paddingLeft="10dp"

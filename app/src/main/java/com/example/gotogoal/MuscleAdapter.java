@@ -25,7 +25,7 @@ public class MuscleAdapter extends BaseAdapter {
         images[4] = R.drawable.biceps;
         images[5] = R.drawable.triceps;
         images[6] = R.drawable.legs;
-        images[7] = R.drawable.buttocks;
+        images[7] = R.drawable.calves;
     }
 
     @Override

@@ -11,7 +11,7 @@ import java.util.function.Function;
 public class AchievementsActivity extends AppCompatActivity {
 
     private DbHelper dbHelper;
-    private String[] exercises = {"'Flat barbell bench press'", "'Barbell squat'", "'Sumo deadlift' OR exercise = 'Classic deadlift'", "'Pull up'", "'Dip'"};
+    private String[] exercises = {"'Flat barbell bench press'", "'Barbell squat'", "'Sumo deadlift' OR exercise = 'Classic deadlift'", "'Pull up'", "'Dip'", "'Overhead press'"};
 
     TextView benchPressTextView;
     TextView squatTextView;
@@ -19,6 +19,7 @@ public class AchievementsActivity extends AppCompatActivity {
     TextView sumTextView;
     TextView pullUpTextView;
     TextView dipTextView;
+    TextView ohpTextView;
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class AchievementsActivity extends AppCompatActivity {
         sumTextView = findViewById(R.id.oneRepSum);
         pullUpTextView = findViewById(R.id.oneRepPullUp);
         dipTextView = findViewById(R.id.oneRepDip);
+        ohpTextView = findViewById(R.id.oneRepOHP);
         setValues(dbHelper::getBestRep);
 
         navigationView.setOnNavigationItemSelectedListener(item -> {
@@ -56,17 +58,23 @@ public class AchievementsActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void setValues(Function<String, Double> getValue){
-        double[] values = new double[5];
+        double[] values = new double[exercises.length];
         for(int i = 0; i < values.length; i ++){
             values[i] = getValue.apply(exercises[i]);
             if(values[i] == -1)
                 values[i] = 0;
         }
-        benchPressTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[0])));
-        squatTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[1])));
-        deadliftTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[2])));
-        sumTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(Double.parseDouble(benchPressTextView.getText().toString()) + Double.parseDouble(squatTextView.getText().toString()) + Double.parseDouble(deadliftTextView.getText().toString()))));
-        pullUpTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[3])));
-        dipTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[4])));
+        benchPressTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[0])) + " kg");
+        squatTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[1])) + " kg");
+        deadliftTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[2])) + " kg");
+        sumTextView.setText(BodyWeightActivity.getProperVal(
+                String.valueOf(Double.parseDouble(benchPressTextView.getText().toString().substring(0, benchPressTextView.getText().toString().length()-3)) +
+                                Double.parseDouble(squatTextView.getText().toString().substring(0, benchPressTextView.getText().toString().length()-3)) +
+                                Double.parseDouble(deadliftTextView.getText().toString().substring(0, benchPressTextView.getText().toString().length()-3)))) +
+                                " kg");
+        pullUpTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[3])) + " kg");
+        dipTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[4])) + " kg");
+        ohpTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[5])) + " kg");
+
     }
 }

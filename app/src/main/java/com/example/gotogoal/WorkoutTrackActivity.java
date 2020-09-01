@@ -48,6 +48,7 @@ public class WorkoutTrackActivity extends AppCompatActivity{
         setTitle(exName);
         workoutAdapter = new WorkoutAdapter(this, dbHelper.getExerciseHistory(exName));
         historyListView.setVisibility(View.GONE);
+        historyListView.setDivider(null);
         historyListView.setAdapter(workoutAdapter);
         idsToUpdate = display();
 

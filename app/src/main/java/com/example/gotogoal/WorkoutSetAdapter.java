@@ -13,8 +13,12 @@ public class WorkoutSetAdapter extends BaseAdapter {
 
     Vector<String> reps;
     Vector<String> kgs;
-    Context c;
     LayoutInflater inflater;
+
+    static class ViewHolder{
+        TextView wTv;
+        TextView rTv;
+    }
 
     public WorkoutSetAdapter(Context c, Vector<String> reps, Vector<String> kgs){
         this.reps = reps;
@@ -39,11 +43,20 @@ public class WorkoutSetAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+
+        ViewHolder holder;
+
         if(view == null){
             view = inflater.inflate(R.layout.exercise_in_workout_listview, null);
+            holder = new ViewHolder();
+            holder.rTv = view.findViewById(R.id.repsTextView);
+            holder.wTv = view.findViewById(R.id.kgsTextView);
+            view.setTag(holder);
+        }else{
+            holder = (ViewHolder) view.getTag();
         }
-        ((TextView) view.findViewById(R.id.repsTextView)).setText(BodyWeightActivity.getProperVal(reps.elementAt(i)) + " reps");
-        ((TextView) view.findViewById(R.id.kgsTextView)).setText(BodyWeightActivity.getProperVal(kgs.elementAt(i)) + " kg");
+        holder.rTv.setText(BodyWeightActivity.getProperVal(reps.elementAt(i)) + " reps");
+        holder.wTv.setText(BodyWeightActivity.getProperVal(kgs.elementAt(i)) + " kg");
         return view;
     }
 }

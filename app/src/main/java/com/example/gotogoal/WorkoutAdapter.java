@@ -10,12 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
 
 import java.util.Vector;
 
@@ -27,6 +29,14 @@ public class WorkoutAdapter extends BaseAdapter{
     private Vector<MainActivity.Training> trainings;
     private Context c;
     private DbHelper dbHelper;
+
+    static class ViewHolder{
+        ListView lV;
+        TextView exTv;
+        ImageView dIv;
+        View cV;
+        View divider;
+    }
 
     public WorkoutAdapter(Context c, Vector<MainActivity.Training> trainings){
         this.trainings = trainings;
@@ -51,31 +61,39 @@ public class WorkoutAdapter extends BaseAdapter{
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        long start = System.currentTimeMillis();
+        ViewHolder holder;
 
-        View v = inflater.inflate(R.layout.workout_listview, null);
+        if(view == null){
+            view = inflater.inflate(R.layout.workout_listview, null);
+            holder = new ViewHolder();
+            holder.dIv = view.findViewById(R.id.deleteImageView);
+            holder.exTv = view.findViewById(R.id.exNameTextView);
+            holder.lV = view.findViewById(R.id.setsListView);
+            holder.cV = view.findViewById(R.id.clickView);
+            holder.divider = view.findViewById(R.id.divider);
+            view.setTag(holder);
+        }else{
+            holder = (ViewHolder) view.getTag();
+        }
 
-        TextView exNameTextView = v.findViewById(R.id.exNameTextView);
-        ListView listView = v.findViewById(R.id.setsListView);
-        ImageView deleteImageView = v.findViewById(R.id.deleteImageView);
-        View clickView = v.findViewById(R.id.clickView);
-        exNameTextView.setText(trainings.elementAt(i).exercise);
+        holder.exTv.setText(trainings.elementAt(i).exercise);
 
         if(c.getClass() == MainActivity.class) {
-            clickView.setOnClickListener(view1 -> updateSets(i));
-            clickView.setOnLongClickListener(view1 -> showDelete(v, i));
+            holder.cV.setOnClickListener(view1 -> updateSets(i));
+            View finalView = view;
+            holder.cV.setOnLongClickListener(view1 -> showDelete(finalView, i));
+        }else{
+            view.setBackground(null);
+            holder.divider.setVisibility(VISIBLE);
         }
 
         WorkoutSetAdapter workoutSetAdapter = new WorkoutSetAdapter(c, trainings.elementAt(i).reps, trainings.elementAt(i).kgs);
-        listView.setAdapter(workoutSetAdapter);
-        deleteImageView.setOnClickListener(view1 -> dbHelper.deleteByDateAndExercise(trainings.elementAt(i).exercise));
+        holder.lV.setAdapter(workoutSetAdapter);
+        holder.dIv.setOnClickListener(view1 -> dbHelper.deleteByDateAndExercise(trainings.elementAt(i).exercise));
 
-        ConstraintLayout.LayoutParams mParam = new ConstraintLayout.LayoutParams(-1, (int)(exNameTextView.getTextSize()*1.9) + (int)(exNameTextView.getTextSize() *(1.85* trainings.elementAt(i).reps.size())));
-        v.setLayoutParams(mParam);
-        long finish = System.currentTimeMillis();
-        long timeElapsed = finish - start;
-        System.out.println(timeElapsed);
-        return v;
+        ConstraintLayout.LayoutParams mParam = new ConstraintLayout.LayoutParams(-1, (int)(holder.exTv.getTextSize()*1.9) + (int)(holder.exTv.getTextSize() *(1.63* trainings.elementAt(i).reps.size())));
+        view.setLayoutParams(mParam);
+        return view;
     }
 
     public void updateSets(int i) {
