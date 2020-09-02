@@ -17,7 +17,6 @@ import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,10 +51,11 @@ public class GraphsActivity extends AppCompatActivity {
             @Override
             public String formatLabel(double value, boolean isValueX){
                 if(isValueX){
-                    return dateFormat.format(new Date((long) value));
-                } else {
+                    return (dateFormat.format(new Date((long) value)));
+                } else if(isValueX){
+                    return "";
+                }else
                     return super.formatLabel(value, false);
-                }
             }
         });
 
@@ -87,6 +87,7 @@ public class GraphsActivity extends AppCompatActivity {
                         break;
                     default:
                         exercisesSpinner.setAdapter(new ArrayAdapter<>(c, R.layout.exercise_spinner_view, getResources().getStringArray(R.array.calves_ex)));
+                        break;
                 }
             }
 
@@ -127,16 +128,30 @@ public class GraphsActivity extends AppCompatActivity {
             lineGraphSeries.setColor(Color.parseColor("#FFFF8800"));
             lineGraphSeries.setDrawDataPoints(true);
             notEnoughDataPointsGraphs.setVisibility(View.GONE);
-            dataPointDetailsGraphs.setVisibility(View.VISIBLE);
-            exerciseGraphView.getGridLabelRenderer().setHumanRounding(true,true);
-            exerciseGraphView.addSeries(lineGraphSeries);
-            if(dataPoints.length > 5)
-                exerciseGraphView.getGridLabelRenderer().setNumHorizontalLabels(6);
-            else
-                exerciseGraphView.getGridLabelRenderer().setNumHorizontalLabels(dataPoints.length+1);
+
             exerciseGraphView.getViewport().setXAxisBoundsManual(true);
+            exerciseGraphView.getViewport().setMinX(dataPoints[0].getX());
             exerciseGraphView.getViewport().setMaxX(dataPoints[dataPoints.length-1].getX());
-            lineGraphSeries.setOnDataPointTapListener( (series, dataPoint) -> dataPointDetailsGraphs.setText(BodyWeightActivity.getProperVal(String.valueOf(dataPoint.getY())) + " kg, " + pointFormat.format(new Date((long)dataPoint.getX()))));
+            exerciseGraphView.getViewport().setScalable(true);
+            exerciseGraphView.getViewport().setScalableY(true);
+            if(dataPoints.length > 5)
+                exerciseGraphView.getGridLabelRenderer().setNumHorizontalLabels(5);
+            else
+                exerciseGraphView.getGridLabelRenderer().setNumHorizontalLabels(dataPoints.length);
+            exerciseGraphView.getGridLabelRenderer().setHumanRounding(false, true);
+            exerciseGraphView.setTitle("Calculated one rep max");
+            exerciseGraphView.addSeries(lineGraphSeries);
+            lineGraphSeries.setOnDataPointTapListener( (series, dataPoint) -> {
+                Cursor c2 = dbHelper.getSetByDateAndOneRep(MainActivity.dateFormatInDb.format(new Date((long) dataPoint.getX())), dataPoint.getY(), exercisesSpinner.getItemAtPosition(i).toString());
+                c2.moveToNext();
+                dataPointDetailsGraphs.setText(BodyWeightActivity.getProperVal(String.valueOf(dataPoint.getY())) + " kg "  +
+                                                " (" + BodyWeightActivity.getProperVal(String.valueOf(c2.getDouble(c2.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)))) +
+                                                " kg x " + c2.getInt(c2.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)) + "), " +
+                                                pointFormat.format(new Date((long)dataPoint.getX())));
+            });
+            dataPointDetailsGraphs.setVisibility(View.VISIBLE);
+
+
         }else {
             notEnoughDataPointsGraphs.setVisibility(View.VISIBLE);
             dataPointDetailsGraphs.setText("");

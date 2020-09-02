@@ -29,6 +29,7 @@ public class WorkoutAdapter extends BaseAdapter{
     private Vector<MainActivity.Training> trainings;
     private Context c;
     private DbHelper dbHelper;
+    private MainActivity mainActivity;
 
     static class ViewHolder{
         ListView lV;
@@ -38,11 +39,12 @@ public class WorkoutAdapter extends BaseAdapter{
         View divider;
     }
 
-    public WorkoutAdapter(Context c, Vector<MainActivity.Training> trainings){
+    public WorkoutAdapter(Context c, Vector<MainActivity.Training> trainings, MainActivity mainActivity){
         this.trainings = trainings;
         this.c = c;
         this.inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         dbHelper = MainActivity.dbHelper;
+        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -89,7 +91,10 @@ public class WorkoutAdapter extends BaseAdapter{
 
         WorkoutSetAdapter workoutSetAdapter = new WorkoutSetAdapter(c, trainings.elementAt(i).reps, trainings.elementAt(i).kgs);
         holder.lV.setAdapter(workoutSetAdapter);
-        holder.dIv.setOnClickListener(view1 -> dbHelper.deleteByDateAndExercise(trainings.elementAt(i).exercise));
+        holder.dIv.setOnClickListener(view1 -> {
+            dbHelper.deleteByDateAndExercise(trainings.elementAt(i).exercise);
+            mainActivity.checkWorkout();
+        });
 
         ConstraintLayout.LayoutParams mParam = new ConstraintLayout.LayoutParams(-1, (int)(holder.exTv.getTextSize()*1.9) + (int)(holder.exTv.getTextSize() *(1.63* trainings.elementAt(i).reps.size())));
         view.setLayoutParams(mParam);

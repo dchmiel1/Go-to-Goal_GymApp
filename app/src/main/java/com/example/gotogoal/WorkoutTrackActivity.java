@@ -46,7 +46,7 @@ public class WorkoutTrackActivity extends AppCompatActivity{
 
         exName = getIntent().getExtras().getString("ex_name");
         setTitle(exName);
-        workoutAdapter = new WorkoutAdapter(this, dbHelper.getExerciseHistory(exName));
+        workoutAdapter = new WorkoutAdapter(this, dbHelper.getExerciseHistory(exName), null);
         historyListView.setVisibility(View.GONE);
         historyListView.setDivider(null);
         historyListView.setAdapter(workoutAdapter);
@@ -66,7 +66,7 @@ public class WorkoutTrackActivity extends AppCompatActivity{
         });
 
         setsListView.setOnItemClickListener((adapterView, view, i, l) -> {
-                if(idsToUpdate.length + newSets < 7) {
+                if(idsToUpdate.length + newSets < 8) {
                     setVisiblity(view);
                     setsListView.addFooterView(getNewSetView(i));
                     ++newSets;

@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
             dbHelper = new DbHelper(this, this);
         }
         checkWorkout();
-        dbHelper.showAll();
 
         graphsImageView.setOnClickListener(view -> {
             Intent showGraphsActivityIntent = new Intent(getApplicationContext(), GraphsActivity.class);
@@ -142,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
         public String exercise;
         public Vector<String> reps;
         public Vector<String> kgs;
-        Training(){
-        }
     }
 
     public void checkWorkout(){
@@ -176,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         else
             emptyTextView.setText("");
 
-        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, trainings);
+        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, trainings, this);
         workoutLayout.setAdapter(workoutAdapter);
         }
 

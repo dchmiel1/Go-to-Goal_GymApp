@@ -24,11 +24,9 @@ public class DbHelper extends SQLiteOpenHelper {
                     DbNames.COLUMN_NAME_KG_ADDED + " REAL, " +
                     DbNames.COLUMN_NAME_ONE_REP + " REAL);";
     private static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + DbNames.TABLE_NAME;
-    private MainActivity mainActivity;
 
     public DbHelper(Context c, MainActivity mainActivity){
         super(c, DATABASE_NAME, null, DATABASE_VERSION);
-        this.mainActivity = mainActivity;
     }
 
     @Override
@@ -240,6 +238,14 @@ public class DbHelper extends SQLiteOpenHelper {
                                 " order by " + DbNames.COLUMN_NAME_DATE, null);
     }
 
+    public Cursor getSetByDateAndOneRep(String date, double oneRep, String exercise){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("select " + DbNames.COLUMN_NAME_REPS + ", " + DbNames.COLUMN_NAME_KG_ADDED +
+                                " from " + DbNames.TABLE_NAME +
+                                " where " + DbNames.COLUMN_NAME_ONE_REP + " = " + oneRep + " and " + DbNames.COLUMN_NAME_DATE + " = '" + date + "' and " + DbNames.COLUMN_NAME_EXERCISE + " = '" + exercise + "'", null);
+
+    }
+
     public void deleteById (Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("sets_table",
@@ -253,7 +259,6 @@ public class DbHelper extends SQLiteOpenHelper {
         db.delete("sets_table",
                 " exercise = ? AND date = ?",
                 new String[] { exName, date });
-        mainActivity.checkWorkout();
     }
 
     private boolean isWeightThatDate(String date){

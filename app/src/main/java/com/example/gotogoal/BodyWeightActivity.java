@@ -222,14 +222,18 @@ public class BodyWeightActivity extends AppCompatActivity {
             lineGraphSeries.setColor(Color.parseColor("#FFFF8800"));
             lineGraphSeries.setDrawDataPoints(true);
             notEnoughDataPointsTextView.setVisibility(View.GONE);
+
+            weightGraph.getViewport().setXAxisBoundsManual(true);
+            weightGraph.getViewport().setMinX(dataPoints[0].getX());
+            weightGraph.getViewport().setMaxX(dataPoints[dataPoints.length-1].getX());
+            weightGraph.getGridLabelRenderer().setHumanRounding(false, true);
             if(dataPoints.length > 5)
                 weightGraph.getGridLabelRenderer().setNumHorizontalLabels(6);
             else
-                weightGraph.getGridLabelRenderer().setNumHorizontalLabels(dataPoints.length+1);
-            weightGraph.getGridLabelRenderer().setHumanRounding(false);
+                weightGraph.getGridLabelRenderer().setNumHorizontalLabels(dataPoints.length);
+            weightGraph.getGridLabelRenderer().setNumVerticalLabels(6);
             weightGraph.addSeries(lineGraphSeries);
-            weightGraph.getViewport().setXAxisBoundsManual(true);
-            weightGraph.getViewport().setMaxX(dataPoints[dataPoints.length-1].getX());
+
             graphDataVisible = true;
             lineGraphSeries.setOnDataPointTapListener((series, dataPoint) -> dataPointDetails.setText(getProperVal(String.valueOf(dataPoint.getY())) + " kg, " + pointFormat.format(new Date((long) dataPoint.getX()))));
 
