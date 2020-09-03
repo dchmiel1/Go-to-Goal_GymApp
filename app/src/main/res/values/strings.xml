@@ -49,6 +49,7 @@
 
     <string-array name="back_ex">
         <item>Pull up</item>
+        <item>Chin up</item>
         <item>Barbell row</item>
         <item>Dumbbell row</item>
         <item>Classic deadlift</item>
@@ -65,7 +66,8 @@
         <item>Standing dumbbell press</item>
         <item>Face pull</item>
         <item>Dumbbell lateral raise</item>
-        <item>Machine lateral raise</item>
+        <item>Cable lateral raise</item>
+        <item>Machine overhead press</item>
     </string-array>
 
     <string-array name="triceps_ex">
@@ -84,6 +86,8 @@
         <item>Cable two-arms curl</item>
         <item>Preacher barbell curl</item>
         <item>Machine curl</item>
+        <item>Hammer dumbbell curl</item>
+        <item>Dumbbell concentration curl</item>
     </string-array>
 
     <string-array name="thighs_ex">

@@ -284,7 +284,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private double calcOneRep(String exName, int reps, double kgAdded){
-        if(exName.equals("'Pull up'") || exName.equals("'Dip'") && reps <= 20) {
+        if((exName.equals("Pull up") || exName.equals("Dip") || exName.equals("Chin up")) && reps <= 20) {
             Cursor c = getLastWeight();
             c.moveToNext();
             return ((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED));
