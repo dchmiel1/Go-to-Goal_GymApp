@@ -238,7 +238,7 @@ public class DbHelper extends SQLiteOpenHelper {
                                 " order by " + DbNames.COLUMN_NAME_DATE, null);
     }
 
-    public Cursor getSetByDateAndOneRep(String date, double oneRep, String exercise){
+    public Cursor getSetByDateAndOneRep(String date, float oneRep, String exercise){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("select " + DbNames.COLUMN_NAME_REPS + ", " + DbNames.COLUMN_NAME_KG_ADDED +
                                 " from " + DbNames.TABLE_NAME +
@@ -292,5 +292,24 @@ public class DbHelper extends SQLiteOpenHelper {
             return kgAdded/((double)MainActivity.multiplier[reps]/100);
         else
             return kgAdded/((double)MainActivity.multiplier[MainActivity.multiplier.length-1]/100);
+    }
+
+    public void changeOneRep(){
+        ContentValues values;
+        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db2 = this.getWritableDatabase();
+        for(int i = 0; i < 610; i++) {
+            values = new ContentValues();
+            Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_ONE_REP + " from " + DbNames.TABLE_NAME +  " where " + DbNames._ID + " = " + i, null);
+            if(c.getCount() > 0){
+                System.out.println(" I: " + i);
+                c.moveToNext();
+                System.out.println(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_ONE_REP)));
+                System.out.println(Double.parseDouble(BodyWeightActivity.getProperVal(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_ONE_REP))))));
+                values.put(DbNames.COLUMN_NAME_ONE_REP, Double.parseDouble(BodyWeightActivity.getProperVal(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_ONE_REP))))));
+                db2.update(DbNames.TABLE_NAME, values, "_id = " + i, null);
+            }
+
+        }
     }
 }

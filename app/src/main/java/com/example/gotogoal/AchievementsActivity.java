@@ -69,8 +69,8 @@ public class AchievementsActivity extends AppCompatActivity {
         deadliftTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[2])) + " kg");
         sumTextView.setText(BodyWeightActivity.getProperVal(
                 String.valueOf(Double.parseDouble(benchPressTextView.getText().toString().substring(0, benchPressTextView.getText().toString().length()-3)) +
-                                Double.parseDouble(squatTextView.getText().toString().substring(0, benchPressTextView.getText().toString().length()-3)) +
-                                Double.parseDouble(deadliftTextView.getText().toString().substring(0, benchPressTextView.getText().toString().length()-3)))) +
+                                Double.parseDouble(squatTextView.getText().toString().substring(0, squatTextView.getText().toString().length()-3)) +
+                                Double.parseDouble(deadliftTextView.getText().toString().substring(0, deadliftTextView.getText().toString().length()-3)))) +
                                 " kg");
         pullUpTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[3])) + " kg");
         dipTextView.setText(BodyWeightActivity.getProperVal(String.valueOf(values[4])) + " kg");

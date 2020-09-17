@@ -1,7 +1,6 @@
 package com.example.gotogoal;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,52 +11,48 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.Utils;
 
-import com.jjoe64.graphview.DefaultLabelFormatter;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class GraphsActivity extends AppCompatActivity {
 
     private Spinner exercisesSpinner;
     private Spinner musclesSpinner;
-    private GraphView exerciseGraphView;
     private Context c;
     private DbHelper dbHelper;
     private SimpleDateFormat dateFormat;
-    private TextView notEnoughDataPointsGraphs;
     private TextView dataPointDetailsGraphs;
+    private LineChart exerciseChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graphs);
 
-        exerciseGraphView = findViewById(R.id.exerciseGraph);
         exercisesSpinner = findViewById(R.id.exercisesSpinner);
         musclesSpinner = findViewById(R.id.musclesSpinner);
         musclesSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.exercise_spinner_view, getResources().getStringArray(R.array.muscles)));
-        notEnoughDataPointsGraphs = findViewById(R.id.notEnoughDataPointsTextViewGraphs);
         dataPointDetailsGraphs = findViewById(R.id.dataPointDetailsGraphs);
+        exerciseChart = findViewById(R.id.exerciseChart);
+        exerciseChart.setNoDataText("Add at least 2 workouts to see the chart");
+        exerciseChart.setNoDataTextColor(Color.parseColor("#8a000000"));
+        exerciseChart.getPaint(Chart.PAINT_INFO).setTextSize(Utils.convertDpToPixel(17f));
         c = this;
         dbHelper = MainActivity.dbHelper;
         dateFormat = new SimpleDateFormat("dd.MM");
-
-        exerciseGraphView.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
-            @Override
-            public String formatLabel(double value, boolean isValueX){
-                if(isValueX){
-                    return (dateFormat.format(new Date((long) value)));
-                } else if(isValueX){
-                    return "";
-                }else
-                    return super.formatLabel(value, false);
-            }
-        });
 
         musclesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @SuppressLint("ResourceType")
@@ -111,51 +106,64 @@ public class GraphsActivity extends AppCompatActivity {
 
     private void setGraphSeries(int i){
         Cursor c = dbHelper.getExerciseOneReps(exercisesSpinner.getItemAtPosition(i).toString());
-        exerciseGraphView.removeAllSeries();
         if(c.getCount() > 1){
-            DataPoint[] dataPoints = new DataPoint[c.getCount()];
+            ArrayList<Entry> values = new ArrayList<>();
             SimpleDateFormat pointFormat = new SimpleDateFormat("dd MMM");
-            int j = 0;
             while (c.moveToNext()) {
                 try {
-                    dataPoints[j] = new DataPoint(MainActivity.dateFormatInDb.parse(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE))), c.getDouble(c.getColumnIndexOrThrow("max(one_rep)")));
+                    values.add(new Entry((float) new Long(MainActivity.dateFormatInDb.parse(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE))).getTime()) + (1000 * 60 * 60 * 12), new Double(c.getDouble(c.getColumnIndexOrThrow("max(one_rep)"))).floatValue()));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                ++j;
             }
-            LineGraphSeries<DataPoint> lineGraphSeries = new LineGraphSeries<>(dataPoints);
-            lineGraphSeries.setColor(Color.parseColor("#FFFF8800"));
-            lineGraphSeries.setDrawDataPoints(true);
-            notEnoughDataPointsGraphs.setVisibility(View.GONE);
+            XAxis xAxis = exerciseChart.getXAxis();
+            xAxis.setValueFormatter(new XAxisValueFormatter());
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            LineDataSet dataSet = new LineDataSet(values, "One rep max");
+            dataSet.setColor(Color.parseColor("#FFFF8800"));
+            dataSet.setCircleColor(Color.parseColor("#FFFF8800"));
+            dataSet.setLineWidth(2);
+            dataSet.setCircleSize(4);
+            dataSet.setValueTextSize(9);
+            LineData lineData = new LineData(dataSet);
+            exerciseChart.setData(lineData);
+            exerciseChart.invalidate();
+            exerciseChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                @Override
+                public void onValueSelected(Entry e, Highlight h) {
+                    Cursor c2 = dbHelper.getSetByDateAndOneRep(MainActivity.dateFormatInDb.format(new Date((long) (e.getX()))), e.getY(), exercisesSpinner.getItemAtPosition(i).toString());
+                    if(c2.getCount() > 0) {
+                        c2.moveToNext();
+                        dataPointDetailsGraphs.setText(BodyWeightActivity.getProperVal(String.valueOf(e.getY())) + " kg " +
+                                " (" + BodyWeightActivity.getProperVal(String.valueOf(c2.getDouble(c2.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)))) +
+                                " kg x " + c2.getInt(c2.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)) + "), " +
+                                pointFormat.format(new Date((long) e.getX())));
+                        dataPointDetailsGraphs.setVisibility(View.VISIBLE);
+                    }
+                }
 
-            exerciseGraphView.getViewport().setXAxisBoundsManual(true);
-            exerciseGraphView.getViewport().setMinX(dataPoints[0].getX());
-            exerciseGraphView.getViewport().setMaxX(dataPoints[dataPoints.length-1].getX());
-            exerciseGraphView.getViewport().setScalable(true);
-            exerciseGraphView.getViewport().setScalableY(true);
-            if(dataPoints.length > 5)
-                exerciseGraphView.getGridLabelRenderer().setNumHorizontalLabels(5);
-            else
-                exerciseGraphView.getGridLabelRenderer().setNumHorizontalLabels(dataPoints.length);
-            exerciseGraphView.getGridLabelRenderer().setHumanRounding(false, true);
-            exerciseGraphView.setTitle("Calculated one rep max");
-            exerciseGraphView.addSeries(lineGraphSeries);
-            lineGraphSeries.setOnDataPointTapListener( (series, dataPoint) -> {
-                Cursor c2 = dbHelper.getSetByDateAndOneRep(MainActivity.dateFormatInDb.format(new Date((long) dataPoint.getX())), dataPoint.getY(), exercisesSpinner.getItemAtPosition(i).toString());
-                c2.moveToNext();
-                dataPointDetailsGraphs.setText(BodyWeightActivity.getProperVal(String.valueOf(dataPoint.getY())) + " kg "  +
-                                                " (" + BodyWeightActivity.getProperVal(String.valueOf(c2.getDouble(c2.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)))) +
-                                                " kg x " + c2.getInt(c2.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS)) + "), " +
-                                                pointFormat.format(new Date((long)dataPoint.getX())));
+                @Override
+                public void onNothingSelected() {
+                    dataPointDetailsGraphs.setVisibility(View.GONE);
+                }
             });
-            dataPointDetailsGraphs.setVisibility(View.VISIBLE);
 
-
-        }else {
-            notEnoughDataPointsGraphs.setVisibility(View.VISIBLE);
+        }
+        else{
+            exerciseChart.clear();
             dataPointDetailsGraphs.setText("");
             dataPointDetailsGraphs.setVisibility(View.GONE);
+        }
+    }
+
+    private class XAxisValueFormatter extends ValueFormatter {
+
+        public XAxisValueFormatter(){
+        }
+
+        @Override
+        public String getFormattedValue(float value) {
+            return dateFormat.format(new Date((long) value));
         }
     }
 }

@@ -10,14 +10,21 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.Chart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.Utils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.jjoe64.graphview.DefaultLabelFormatter;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 import com.shawnlin.numberpicker.NumberPicker;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -48,12 +55,11 @@ public class BodyWeightActivity extends AppCompatActivity {
     private RelativeLayout datePickersLayout;
 
     //bodyWeight items
-    private GraphView weightGraph;
+    private LineChart weightChart;
     private ImageView addWeightImageButton;
     private NumberPicker weightPicker1;
     private NumberPicker weightPicker2;
     private TextView dataPointDetails;
-    private TextView notEnoughDataPointsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +67,6 @@ public class BodyWeightActivity extends AppCompatActivity {
         setContentView(R.layout.activity_body_weight);
 
         profileListView = findViewById(R.id.profileListView);
-        weightGraph = findViewById(R.id.weightGraph);
         navigationView = findViewById(R.id.profileNavigationBar);
         addWeightImageButton = findViewById(R.id.addWeightImageButton);
         weightPicker1 = findViewById(R.id.bodyWeightPicker1);
@@ -75,8 +80,11 @@ public class BodyWeightActivity extends AppCompatActivity {
         darkView = findViewById(R.id.darkView);
         datePickersLayout = findViewById(R.id.datePickersLayout);
         dataPointDetails = findViewById(R.id.dataPointDetails);
-        notEnoughDataPointsTextView = findViewById(R.id.notEnoughDataPointsTextView);
+        weightChart = findViewById(R.id.weightChart);
 
+        weightChart.setNoDataText("Add at least 2 body weight data to see the chart");
+        weightChart.setNoDataTextColor(Color.parseColor("#8a000000"));
+        weightChart.getPaint(Chart.PAINT_INFO).setTextSize(Utils.convertDpToPixel(17f));
         whichPicker = null;
         datePickersLayout.setVisibility(View.GONE);
         darkView.setVisibility(View.GONE);
@@ -87,16 +95,6 @@ public class BodyWeightActivity extends AppCompatActivity {
         profileListView.setAdapter(profileListViewAdapter);
         dateFormat = new SimpleDateFormat("dd.MM");
 
-        weightGraph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter(){
-            @Override
-            public String formatLabel(double value, boolean isValueX){
-                if(isValueX){
-                    return dateFormat.format(new Date((long) value));
-                } else {
-                    return super.formatLabel(value, false);
-                }
-            }
-        });
         setGraphSeries();
         setPickers();
 
@@ -205,64 +203,63 @@ public class BodyWeightActivity extends AppCompatActivity {
 
     private void setGraphSeries(){
         Cursor c = dbHelper.getWeightData();
-        weightGraph.removeAllSeries();
         if(c.getCount() > 1){
-            DataPoint[] dataPoints = new DataPoint[c.getCount()];
+            ArrayList<Entry> values = new ArrayList<>();
             SimpleDateFormat pointFormat = new SimpleDateFormat("dd MMM");
-            int i = 0;
             while (c.moveToNext()) {
                 try {
-                    dataPoints[i] = new DataPoint(MainActivity.dateFormatInDb.parse(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE))), c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)));
+                    values.add(new Entry((float) new Long(MainActivity.dateFormatInDb.parse(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE))).getTime()) + (1000 * 60 * 60 * 12), new Double(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))).floatValue()));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                ++i;
             }
-            LineGraphSeries<DataPoint> lineGraphSeries = new LineGraphSeries<>(dataPoints);
-            lineGraphSeries.setColor(Color.parseColor("#FFFF8800"));
-            lineGraphSeries.setDrawDataPoints(true);
-            notEnoughDataPointsTextView.setVisibility(View.GONE);
+            XAxis xAxis = weightChart.getXAxis();
+            xAxis.setValueFormatter(new XAxisValueFormatter());
+            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+            LineDataSet dataSet = new LineDataSet(values, "Body weight");
+            dataSet.setColor(Color.parseColor("#FFFF8800"));
+            dataSet.setCircleColor(Color.parseColor("#FFFF8800"));
+            dataSet.setLineWidth(2);
+            dataSet.setCircleSize(4);
+            dataSet.setValueTextSize(9);
+            LineData lineData = new LineData(dataSet);
+            weightChart.setData(lineData);
+            weightChart.invalidate();
+            weightChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+                @Override
+                public void onValueSelected(Entry e, Highlight h) {
+                    dataPointDetails.setVisibility(View.VISIBLE);
+                    dataPointDetails.setText(getProperVal(String.valueOf(e.getY())) + " kg, " + pointFormat.format(new Date((long) e.getX())));
+                }
 
-            weightGraph.getViewport().setXAxisBoundsManual(true);
-            weightGraph.getViewport().setMinX(dataPoints[0].getX());
-            weightGraph.getViewport().setMaxX(dataPoints[dataPoints.length-1].getX());
-            weightGraph.getGridLabelRenderer().setHumanRounding(false, true);
-            if(dataPoints.length > 5)
-                weightGraph.getGridLabelRenderer().setNumHorizontalLabels(6);
-            else
-                weightGraph.getGridLabelRenderer().setNumHorizontalLabels(dataPoints.length);
-            weightGraph.getGridLabelRenderer().setNumVerticalLabels(6);
-            weightGraph.addSeries(lineGraphSeries);
+                @Override
+                public void onNothingSelected() {
+                    dataPointDetails.setVisibility(View.GONE);
+                }
+            });
 
-            graphDataVisible = true;
-            lineGraphSeries.setOnDataPointTapListener((series, dataPoint) -> dataPointDetails.setText(getProperVal(String.valueOf(dataPoint.getY())) + " kg, " + pointFormat.format(new Date((long) dataPoint.getX()))));
-
-        }else {
-            if (weightGraph.getVisibility() == View.VISIBLE)
-                notEnoughDataPointsTextView.setVisibility(View.VISIBLE);
+        }
+        else{
             graphDataVisible = false;
         }
     }
 
     private void showBodyWeight(){
         profileListView.setVisibility(View.GONE);
-        weightGraph.setVisibility(View.VISIBLE);
+        weightChart.setVisibility(View.VISIBLE);
         addWeightImageButton.setVisibility(View.VISIBLE);
         if(graphDataVisible) {
-            notEnoughDataPointsTextView.setVisibility(View.GONE);
             dataPointDetails.setVisibility(View.VISIBLE);
         }
         else {
-            notEnoughDataPointsTextView.setVisibility(View.VISIBLE);
             dataPointDetails.setVisibility(View.GONE);
         }
     }
 
     private void showProfile(){
         profileListView.setVisibility(View.VISIBLE);
-        weightGraph.setVisibility(View.GONE);
+        weightChart.setVisibility(View.GONE);
         addWeightImageButton.setVisibility(View.GONE);
-        notEnoughDataPointsTextView.setVisibility(View.GONE);
         dataPointDetails.setVisibility(View.GONE);
     }
 
@@ -317,5 +314,16 @@ public class BodyWeightActivity extends AppCompatActivity {
         datePicker3.setDisplayedValues(years);
         datePicker2.setDisplayedValues(months);
         datePicker1.setDisplayedValues(days);
+    }
+
+    private class XAxisValueFormatter extends ValueFormatter {
+
+        public XAxisValueFormatter(){
+        }
+
+        @Override
+        public String getFormattedValue(float value) {
+            return dateFormat.format(new Date((long) value));
+        }
     }
 }

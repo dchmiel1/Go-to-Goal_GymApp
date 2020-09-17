@@ -74,6 +74,12 @@ public class MainActivity extends AppCompatActivity {
         if(dbHelper == null) {
             dbHelper = new DbHelper(this, this);
         }
+
+        dbHelper.showAll();
+        for(int i = 0; i < 100; i ++){
+            dbHelper.deleteById(i);
+        }
+        //dbHelper.changeOneRep();
         checkWorkout();
 
         graphsImageView.setOnClickListener(view -> {

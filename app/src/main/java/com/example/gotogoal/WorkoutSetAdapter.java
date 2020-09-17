@@ -56,7 +56,10 @@ public class WorkoutSetAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
         holder.rTv.setText(BodyWeightActivity.getProperVal(reps.elementAt(i)) + " reps");
-        holder.wTv.setText(BodyWeightActivity.getProperVal(kgs.elementAt(i)) + " kg");
+        if(kgs.elementAt(i).equals("0.0"))
+            holder.wTv.setText("-");
+        else
+            holder.wTv.setText(BodyWeightActivity.getProperVal(kgs.elementAt(i)) + " kg");
         return view;
     }
 }
