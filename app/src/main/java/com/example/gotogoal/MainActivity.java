@@ -71,14 +71,10 @@ public class MainActivity extends AppCompatActivity {
             dateTextView.setText("Today");
         }
 
-        if(dbHelper == null) {
+        if(dbHelper == null)
             dbHelper = new DbHelper(this, this);
-        }
 
-        dbHelper.showAll();
-        for(int i = 0; i < 100; i ++){
-            dbHelper.deleteById(i);
-        }
+        //dbHelper.showAll();
         //dbHelper.changeOneRep();
         checkWorkout();
 

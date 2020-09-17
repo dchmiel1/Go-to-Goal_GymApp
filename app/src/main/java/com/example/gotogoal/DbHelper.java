@@ -246,6 +246,16 @@ public class DbHelper extends SQLiteOpenHelper {
 
     }
 
+    public Cursor getExerciseVolume(String exercise){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_DATE + ", " + "sum(" + DbNames.COLUMN_NAME_KG_ADDED + " * " + DbNames.COLUMN_NAME_REPS + ") " +
+                                    "from " + DbNames.TABLE_NAME +
+                                    " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + "'" + exercise + "'" +
+                                    " group by " + DbNames.COLUMN_NAME_DATE +
+                                    " order by " + DbNames.COLUMN_NAME_DATE, null);
+        return c;
+    }
+
     public void deleteById (Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("sets_table",
