@@ -299,16 +299,16 @@ public class DbHelper extends SQLiteOpenHelper {
             c.moveToNext();
             return ((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED));
         }else if(reps <= MainActivity.multiplier.length-1)
-            return kgAdded/((double)MainActivity.multiplier[reps]/100);
+            return Double.parseDouble(BodyWeightActivity.getProperVal(String.valueOf(kgAdded/((double)MainActivity.multiplier[reps]/100))));
         else
-            return kgAdded/((double)MainActivity.multiplier[MainActivity.multiplier.length-1]/100);
+            return Double.parseDouble(BodyWeightActivity.getProperVal(String.valueOf(kgAdded/((double)MainActivity.multiplier[MainActivity.multiplier.length-1]/100))));
     }
 
     public void changeOneRep(){
         ContentValues values;
         SQLiteDatabase db = this.getReadableDatabase();
         SQLiteDatabase db2 = this.getWritableDatabase();
-        for(int i = 0; i < 610; i++) {
+        for(int i = 0; i < 650; i++) {
             values = new ContentValues();
             Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_ONE_REP + " from " + DbNames.TABLE_NAME +  " where " + DbNames._ID + " = " + i, null);
             if(c.getCount() > 0){
