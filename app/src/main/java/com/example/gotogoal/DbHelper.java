@@ -155,7 +155,7 @@ public class DbHelper extends SQLiteOpenHelper {
         dateCursor = db.rawQuery("select " + DbNames.COLUMN_NAME_DATE +
                 " from " + DbNames.TABLE_NAME +
                 " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + exName +
-                "order by " + DbNames.COLUMN_NAME_DATE + " DESC", null);
+                " order by " + DbNames.COLUMN_NAME_DATE + " DESC", null);
         if(dateCursor.getCount() > 0){
             dateCursor.moveToNext();
             lastDate = dateCursor.getString(dateCursor.getColumnIndexOrThrow(DbNames.COLUMN_NAME_DATE));
@@ -164,7 +164,7 @@ public class DbHelper extends SQLiteOpenHelper {
         }
         Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_ONE_REP +
                 " from " + DbNames.TABLE_NAME +
-                " where " + DbNames.COLUMN_NAME_EXERCISE + " = " + exName + " and " + DbNames.COLUMN_NAME_DATE + " = " + "'" +lastDate+ "'" +
+                " where  (" + DbNames.COLUMN_NAME_EXERCISE + " = " + exName + ") and " + DbNames.COLUMN_NAME_DATE + " = " + "'" +lastDate+ "'" +
                 " order by " + DbNames.COLUMN_NAME_ONE_REP + " DESC", null);
         if(c.getCount() > 0) {
             c.moveToNext();
@@ -282,6 +282,9 @@ public class DbHelper extends SQLiteOpenHelper {
     public void showAll(){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery( "select * from " + DbNames.TABLE_NAME, null );
+        for(int i = 0 ; i < 500; i ++){
+            c.moveToNext();
+        }
         while(c.moveToNext()){
             System.out.println("************");
             System.out.println("ID: " + c.getInt(c.getColumnIndexOrThrow(DbNames._ID)));
@@ -297,7 +300,7 @@ public class DbHelper extends SQLiteOpenHelper {
         if((exName.equals("Pull up") || exName.equals("Dip") || exName.equals("Chin up")) && reps <= 20) {
             Cursor c = getLastWeight();
             c.moveToNext();
-            return ((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED));
+            return Double.parseDouble(BodyWeightActivity.getProperVal(String.valueOf(((kgAdded +c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))) / ((double)MainActivity.multiplier[reps]/100)) - c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED)))));
         }else if(reps <= MainActivity.multiplier.length-1)
             return Double.parseDouble(BodyWeightActivity.getProperVal(String.valueOf(kgAdded/((double)MainActivity.multiplier[reps]/100))));
         else
@@ -308,14 +311,11 @@ public class DbHelper extends SQLiteOpenHelper {
         ContentValues values;
         SQLiteDatabase db = this.getReadableDatabase();
         SQLiteDatabase db2 = this.getWritableDatabase();
-        for(int i = 0; i < 650; i++) {
+        for(int i = 642; i < 645; i++) {
             values = new ContentValues();
             Cursor c = db.rawQuery("select " + DbNames.COLUMN_NAME_ONE_REP + " from " + DbNames.TABLE_NAME +  " where " + DbNames._ID + " = " + i, null);
             if(c.getCount() > 0){
-                System.out.println(" I: " + i);
                 c.moveToNext();
-                System.out.println(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_ONE_REP)));
-                System.out.println(Double.parseDouble(BodyWeightActivity.getProperVal(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_ONE_REP))))));
                 values.put(DbNames.COLUMN_NAME_ONE_REP, Double.parseDouble(BodyWeightActivity.getProperVal(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_ONE_REP))))));
                 db2.update(DbNames.TABLE_NAME, values, "_id = " + i, null);
             }
