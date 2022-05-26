@@ -40,10 +40,28 @@ public class DbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void deleteDb() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(SQL_DELETE_TABLE);
+        onCreate(db);
+    }
+
     public void insertSet (String exName, int reps, double kgAdded) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DbNames.COLUMN_NAME_DATE, new SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(MainActivity.date));
+        values.put(DbNames.COLUMN_NAME_EXERCISE, exName);
+        values.put(DbNames.COLUMN_NAME_REPS, reps);
+        values.put(DbNames.COLUMN_NAME_KG_ADDED, kgAdded);
+        values.put(DbNames.COLUMN_NAME_ONE_REP, calcOneRep(exName, reps, kgAdded));
+        db.insert(DbNames.TABLE_NAME, null, values);
+    }
+
+    public void insertBackupSet (String date, String exName, int reps, String kgAddedString) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        double kgAdded = Double.parseDouble(kgAddedString);
+        ContentValues values = new ContentValues();
+        values.put(DbNames.COLUMN_NAME_DATE, date);
         values.put(DbNames.COLUMN_NAME_EXERCISE, exName);
         values.put(DbNames.COLUMN_NAME_REPS, reps);
         values.put(DbNames.COLUMN_NAME_KG_ADDED, kgAdded);
