@@ -35,6 +35,7 @@ public class WorkoutAdapter extends BaseAdapter{
         ListView lV;
         TextView exTv;
         ImageView dIv;
+        ImageView chIv;
         View cV;
         View divider;
     }
@@ -72,6 +73,7 @@ public class WorkoutAdapter extends BaseAdapter{
             holder.exTv = view.findViewById(R.id.exNameTextView);
             holder.lV = view.findViewById(R.id.setsListView);
             holder.cV = view.findViewById(R.id.clickView);
+            holder.chIv = view.findViewById(R.id.exerciseChartImageView);
             holder.divider = view.findViewById(R.id.divider);
             view.setTag(holder);
         }else{
@@ -96,6 +98,13 @@ public class WorkoutAdapter extends BaseAdapter{
             mainActivity.checkWorkout();
         });
 
+        holder.chIv.setOnClickListener(view1 -> {
+            Intent showChartIntent = new Intent(c, GraphsActivity.class);
+            showChartIntent.putExtra("exercise", trainings.elementAt(i).exercise);
+            c.startActivity(showChartIntent);
+            mainActivity.checkWorkout();
+        });
+
         ConstraintLayout.LayoutParams mParam = new ConstraintLayout.LayoutParams(-1, (int)(holder.exTv.getTextSize()*1.9) + (int)(holder.exTv.getTextSize() *(1.63* trainings.elementAt(i).reps.size())));
         view.setLayoutParams(mParam);
         return view;
@@ -110,14 +119,18 @@ public class WorkoutAdapter extends BaseAdapter{
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private boolean showDelete(View v, int i){
         v.findViewById(R.id.deleteImageView).setVisibility(VISIBLE);
+        v.findViewById(R.id.deleteImageView).startAnimation(mainActivity.slideLeftIn);
+        v.findViewById(R.id.exerciseChartImageView).setVisibility(VISIBLE);
+        v.findViewById(R.id.exerciseChartImageView).startAnimation(mainActivity.slideLeftIn);
         v.findViewById(R.id.clickView).setOnClickListener(view -> hideDelete(v, i));
-        v.setBackgroundColor(Color.parseColor("#9C9691"));
+        v.setBackgroundColor(Color.parseColor("#696360"));
         return true;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void hideDelete(View v, int i){
         v.findViewById(R.id.deleteImageView).setVisibility(View.GONE);
+        v.findViewById(R.id.exerciseChartImageView).setVisibility(View.GONE);
         v.findViewById(R.id.clickView).setOnClickListener(view -> updateSets(i));
         v.setBackground(c.getResources().getDrawable(R.drawable.border_dark_orange, null));
     }

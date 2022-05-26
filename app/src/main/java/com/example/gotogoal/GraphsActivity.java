@@ -28,6 +28,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.function.Supplier;
 
@@ -43,6 +44,7 @@ public class GraphsActivity extends AppCompatActivity {
     private BottomNavigationView graphsActivityBar;
     private ChartType chartType;
     private SimpleDateFormat pointFormat = new SimpleDateFormat("dd MMM");
+    private int startIndex = 0;
 
     private enum ChartType { VOLUME, ONE_REP_MAX };
 
@@ -69,6 +71,31 @@ public class GraphsActivity extends AppCompatActivity {
         dbHelper = MainActivity.dbHelper;
         chartType = ChartType.ONE_REP_MAX;
         dateFormat = new SimpleDateFormat("dd.MM");
+
+        if(getIntent().hasExtra("exercise")){
+            String exercise = getIntent().getExtras().getString("exercise");
+            int[] musclesArrays = new int[8];
+            musclesArrays[0] = R.array.chest_ex;
+            musclesArrays[1] = R.array.abs_ex;
+            musclesArrays[2] = R.array.back_ex;
+            musclesArrays[3] = R.array.shoulders_ex;
+            musclesArrays[4] = R.array.biceps_ex;
+            musclesArrays[5] = R.array.triceps_ex;
+            musclesArrays[6] = R.array.thighs_ex;
+            musclesArrays[7] = R.array.calves_ex;
+
+            int i = 0;
+            int j = 0;
+            for(i = 0; i < 8; i ++)
+                if(Arrays.asList(getResources().getStringArray(musclesArrays[i])).contains(exercise))
+                    break;
+            musclesSpinner.setSelection(i);
+            for(j = 0; j < getResources().getStringArray(musclesArrays[i]).length; j ++) {
+                if (getResources().getStringArray(musclesArrays[i])[j].equals(exercise))
+                    break;
+            }
+            startIndex = j;
+        }
 
         musclesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @SuppressLint("ResourceType")
@@ -100,6 +127,8 @@ public class GraphsActivity extends AppCompatActivity {
                         exercisesSpinner.setAdapter(new ArrayAdapter<>(c, R.layout.exercise_spinner_view, getResources().getStringArray(R.array.calves_ex)));
                         break;
                 }
+                exercisesSpinner.setSelection(startIndex);
+                startIndex = 0;
             }
 
             @Override

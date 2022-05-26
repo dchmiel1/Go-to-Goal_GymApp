@@ -28,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView workoutLayout;
     public static int[] multiplier;
     public static SimpleDateFormat dateFormatInDb;
+    public Animation slideLeftIn;
+    public Animation slideRightIn;
     private TextView dateTextView;
 
     @Override
@@ -53,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
         ImageView rightImageBtn = findViewById(R.id.rightImageBtn);
         ImageView leftImageBtn = findViewById(R.id.leftImageBtn);
         workoutLayout = findViewById(R.id.workoutListView);
-        final Animation slideLeftIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_in);
-        final Animation slideRightIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_right_in);
         emptyTextView = findViewById(R.id.emptyTextView);
+        slideLeftIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_in);
+        slideRightIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_right_in);
         if(getIntent().hasExtra("date")) {
             try {
                 date = dateFormatInDb.parse(getIntent().getExtras().getString("date"));
