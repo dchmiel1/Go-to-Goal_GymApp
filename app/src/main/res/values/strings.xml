@@ -45,6 +45,7 @@
         <item>Machine fly</item>
         <item>Machine press</item>
         <item>Cable crossover</item>
+        <item>Paused flat barbell bench press</item>
     </string-array>
 
     <string-array name="back_ex">
@@ -95,6 +96,8 @@
         <item>Sumo deadlift</item>
         <item>Dumbbell squat</item>
         <item>Dumbbell calf raise</item>
+        <item>Hack squat</item>
+        <item>Deficit deadlift</item>
     </string-array>
 
     <string-array name="abs_ex">
