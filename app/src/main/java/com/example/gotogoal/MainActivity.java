@@ -2,23 +2,24 @@ package com.example.gotogoal;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,12 +32,34 @@ public class MainActivity extends AppCompatActivity {
     public Animation slideLeftIn;
     public Animation slideRightIn;
     private TextView dateTextView;
+    private Animation slideLeftInFast;
+    private Animation slideRightInFast;
 
     @Override
     public Resources.Theme getTheme() {
         Resources.Theme theme = super.getTheme();
         theme.applyStyle(R.style.AppThemeWithoutBar, true);
         return theme;
+    }
+
+    @Override
+    public void onBackPressed() {
+        System.out.println("BACK PRESSED");
+        if(dateTextView.getText() == "Today")
+            this.finishAffinity();
+        else
+            if(new Date().after(date)) {
+                setAnimation(slideLeftInFast);
+                setAnimation(slideLeftInFast);
+                updateDate(System.currentTimeMillis());
+                checkWorkout();
+            }
+            else{
+                setAnimation(slideRightInFast);
+                setAnimation(slideRightInFast);
+                updateDate(System.currentTimeMillis());
+                checkWorkout();
+            }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -57,17 +80,19 @@ public class MainActivity extends AppCompatActivity {
         workoutLayout = findViewById(R.id.workoutListView);
         emptyTextView = findViewById(R.id.emptyTextView);
         slideLeftIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_in);
+        slideLeftInFast = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_in_fast);
         slideRightIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_right_in);
+        slideRightInFast = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_right_in_fast);
+
         if(getIntent().hasExtra("date")) {
             try {
                 date = dateFormatInDb.parse(getIntent().getExtras().getString("date"));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            setDate();
+            updateDate(date.getTime());
         }else {
-            date = new Date();
-            dateTextView.setText("Today");
+            updateDate(System.currentTimeMillis());
         }
 
         if(dbHelper == null)
@@ -96,44 +121,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
         rightImageBtn.setOnClickListener(view -> {
-            setAnimation(slideLeftIn);
-            date = new Date(date.getTime() + (1000 * 60 * 60 * 24));
-            setDate();
-            checkWorkout();
+            nextDay();
         });
 
         leftImageBtn.setOnClickListener(view -> {
-            setAnimation(slideRightIn);
-            date = new Date(date.getTime() - (1000 * 60 * 60 * 24));
-            setDate();
-            checkWorkout();
+            previousDay();
         });
     }
 
-    private void setDate(){
-        Calendar c1 = Calendar.getInstance();
-        Calendar c2 = Calendar.getInstance();
-        c2.setTime(new Date());
-        c1.setTime(date);
-        int dayC1= c1.get(Calendar.DAY_OF_MONTH);
-        int monthC1 = c1.get(Calendar.MONTH);
-        int yearC1 = c1.get(Calendar.YEAR);
-        int dayC2= c2.get(Calendar.DAY_OF_MONTH);
-        int monthC2 = c2.get(Calendar.MONTH);
-        int yearC2 = c2.get(Calendar.YEAR);
-        if(monthC1 == monthC2 && yearC1 == yearC2) {
-            if (dayC1 == dayC2) {
-                dateTextView.setText("Today");
-            } else
-                if (dayC1 == dayC2 + 1)
-                    dateTextView.setText("Tomorrow");
-                else
-                    if (dayC1 == dayC2 - 1)
-                        dateTextView.setText("Yesterday");
-                    else
-                        dateTextView.setText(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
-        }else
-            dateTextView.setText(new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date));
+    private void updateDate(long datetime){
+        if(date == null)
+            date = new Date(datetime);
+        date.setTime(datetime);
+        String dateText = "";
+        if(DateUtils.isToday(datetime))
+            dateText = "Today";
+        if(DateUtils.isToday(datetime + TimeUnit.DAYS.toMillis(1)))
+            dateText = "Yesterday";
+        if(DateUtils.isToday(datetime - TimeUnit.DAYS.toMillis(1)))
+            dateText = "Tomorrow";
+        if(dateText == "")
+            dateText = new SimpleDateFormat("EEEE, dd MMM", Locale.getDefault()).format(date);
+
+        dateTextView.setText(dateText);
     }
 
     public static class Training {
@@ -183,5 +193,17 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.hDiv2).startAnimation(anim);
         findViewById(R.id.vDiv1).startAnimation(anim);
         findViewById(R.id.vDiv2).startAnimation(anim);
+    }
+
+    private void nextDay() {
+        setAnimation(slideLeftIn);
+        updateDate(date.getTime() + (1000 * 60 * 60 * 24));
+        checkWorkout();
+    }
+
+    private void previousDay() {
+        setAnimation(slideRightIn);
+        updateDate(date.getTime() - (1000 * 60 * 60 * 24));
+        checkWorkout();
     }
 }
