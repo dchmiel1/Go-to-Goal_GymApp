@@ -137,6 +137,13 @@ public class DbHelper extends SQLiteOpenHelper {
                             " where " + DbNames.COLUMN_NAME_DATE + " =  '" + MainActivity.dateFormatInDb.format(MainActivity.date) + "' and " + DbNames.COLUMN_NAME_EXERCISE + " != 'weight'", null);
     }
 
+    public Cursor getSetsByDate(long datetime){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("select " + DbNames.COLUMN_NAME_EXERCISE + ", " + DbNames.COLUMN_NAME_KG_ADDED + ", " + DbNames.COLUMN_NAME_REPS +
+                " from " + DbNames.TABLE_NAME +
+                " where " + DbNames.COLUMN_NAME_DATE + " =  '" + MainActivity.dateFormatInDb.format(new Date(datetime)) + "' and " + DbNames.COLUMN_NAME_EXERCISE + " != 'weight'", null);
+    }
+
     public Cursor getSetsByDateAndExercise(String date, String exercise){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("select " + DbNames.COLUMN_NAME_EXERCISE + ", " + DbNames.COLUMN_NAME_REPS + ", " + DbNames.COLUMN_NAME_KG_ADDED +", "+ DbNames._ID+
