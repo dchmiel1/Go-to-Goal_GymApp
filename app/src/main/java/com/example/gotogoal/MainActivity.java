@@ -2,17 +2,19 @@ package com.example.gotogoal;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,15 +27,38 @@ public class MainActivity extends AppCompatActivity {
 
     public static Date date;
     public static DbHelper dbHelper;
-    private TextView emptyTextView;
-    private ListView workoutLayout;
     public static int[] multiplier;
     public static SimpleDateFormat dateFormatInDb;
-    public Animation slideLeftIn;
-    public Animation slideRightIn;
     private TextView dateTextView;
-    private Animation slideLeftInFast;
-    private Animation slideRightInFast;
+    private ViewPager viewPager;
+    static public Animation slideLeftIn;
+    static int START_POS = 5000;
+    static int curr_pos;
+
+    public static class ViewPagerAdapter extends FragmentStatePagerAdapter {
+        private Context c;
+
+        public ViewPagerAdapter(FragmentManager fragmentManager, Context c) {
+            super(fragmentManager);
+            this.c = c;
+        }
+        @Override
+        public int getCount() {
+            return 10000;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            long datetime = date.getTime();
+
+            if(position == curr_pos + 1)
+                datetime = date.getTime() + 1000 * 60 * 60 * 24;
+            else if (position == curr_pos - 1)
+                datetime = date.getTime() - 1000 * 60 * 60 * 24;
+
+            return ArrayListFragment.init(datetime, c);
+        }
+    }
 
     @Override
     public Resources.Theme getTheme() {
@@ -44,23 +69,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        System.out.println("BACK PRESSED");
-        if(dateTextView.getText() == "Today")
+        if(dateTextView.getText() == "Today") {
             this.finishAffinity();
-        else
-            if(new Date().after(date)) {
-                setAnimation(slideLeftInFast);
-                setAnimation(slideLeftInFast);
-                updateDate(System.currentTimeMillis());
-                checkWorkout();
-            }
-            else{
-                setAnimation(slideRightInFast);
-                setAnimation(slideRightInFast);
-                updateDate(System.currentTimeMillis());
-                checkWorkout();
-            }
+        }
+        else {
+            curr_pos = START_POS;
+            updateDate(System.currentTimeMillis());
+            viewPager.setCurrentItem(curr_pos, true);
+        }
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -77,12 +95,13 @@ public class MainActivity extends AppCompatActivity {
         ImageView graphsImageView = findViewById(R.id.graphsImageView);
         ImageView rightImageBtn = findViewById(R.id.rightImageBtn);
         ImageView leftImageBtn = findViewById(R.id.leftImageBtn);
-        workoutLayout = findViewById(R.id.workoutListView);
-        emptyTextView = findViewById(R.id.emptyTextView);
+        viewPager = findViewById(R.id.viewpager);
         slideLeftIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_in);
-        slideLeftInFast = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left_in_fast);
-        slideRightIn = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_right_in);
-        slideRightInFast = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_right_in_fast);
+
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), this);
+        viewPager.setAdapter(viewPagerAdapter);
+        viewPager.setPageMargin(40);
+        viewPager.setPageMarginDrawable(R.color.colorBrightMenu);
 
         if(getIntent().hasExtra("date")) {
             try {
@@ -90,15 +109,17 @@ public class MainActivity extends AppCompatActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            curr_pos = START_POS - (int) ((System.currentTimeMillis() - date.getTime()) / TimeUnit.DAYS.toMillis(1));
             updateDate(date.getTime());
         }else {
+            curr_pos = START_POS;
             updateDate(System.currentTimeMillis());
         }
 
+        viewPager.setCurrentItem(curr_pos);
+
         if(dbHelper == null)
             dbHelper = new DbHelper(this, this);
-
-        checkWorkout();
 
         graphsImageView.setOnClickListener(view -> {
             Intent showGraphsActivityIntent = new Intent(getApplicationContext(), GraphsActivity.class);
@@ -122,10 +143,29 @@ public class MainActivity extends AppCompatActivity {
 
         rightImageBtn.setOnClickListener(view -> {
             nextDay();
+            viewPager.setCurrentItem(curr_pos, true);
         });
 
         leftImageBtn.setOnClickListener(view -> {
             previousDay();
+            viewPager.setCurrentItem(curr_pos, true);
+        });
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            @Override
+            public void onPageSelected(int position) {
+                if(position > curr_pos)
+                    nextDay();
+                else if(position < curr_pos)
+                    previousDay();
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+            @Override
+            public void onPageScrollStateChanged(int state) {}
         });
     }
 
@@ -152,58 +192,13 @@ public class MainActivity extends AppCompatActivity {
         public Vector<String> kgs;
     }
 
-    public void checkWorkout(){
-        Cursor c = dbHelper.getSetsByDate();
-        Vector<Training> trainings = new Vector<>();
-        boolean found = false;
-        Training training;
-        while(c.moveToNext()){
-            for(int i = 0; i < trainings.size(); i ++)
-                if (trainings.elementAt(i).exercise.equals(c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE)))) {
-                    trainings.elementAt(i).reps.add(String.valueOf(c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS))));
-                    trainings.elementAt(i).kgs.add(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))));
-                    found = true;
-                }
-                if(found) {
-                    found = false;
-                    continue;
-                }
-                training = new Training();
-                training.exercise = c.getString(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_EXERCISE));
-                training.reps = new Vector<>();
-                training.kgs = new Vector<>();
-                training.reps.add(String.valueOf(c.getInt(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_REPS))));
-                training.kgs.add(String.valueOf(c.getDouble(c.getColumnIndexOrThrow(DbNames.COLUMN_NAME_KG_ADDED))));
-                trainings.add(training);
-            }
-
-        if(trainings.size() == 0)
-            emptyTextView.setText("Workout is empty");
-        else
-            emptyTextView.setText("");
-
-        WorkoutAdapter workoutAdapter = new WorkoutAdapter(this, trainings, this);
-        workoutLayout.setAdapter(workoutAdapter);
-        }
-
-    private void setAnimation(Animation anim){
-        workoutLayout.startAnimation(anim);
-        emptyTextView.startAnimation(anim);
-        findViewById(R.id.hDiv1).startAnimation(anim);
-        findViewById(R.id.hDiv2).startAnimation(anim);
-        findViewById(R.id.vDiv1).startAnimation(anim);
-        findViewById(R.id.vDiv2).startAnimation(anim);
-    }
-
     private void nextDay() {
-        setAnimation(slideLeftIn);
+        curr_pos += 1;
         updateDate(date.getTime() + (1000 * 60 * 60 * 24));
-        checkWorkout();
     }
 
     private void previousDay() {
-        setAnimation(slideRightIn);
+        curr_pos -= 1;
         updateDate(date.getTime() - (1000 * 60 * 60 * 24));
-        checkWorkout();
     }
 }
