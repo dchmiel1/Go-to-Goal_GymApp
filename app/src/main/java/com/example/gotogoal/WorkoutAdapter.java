@@ -4,21 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.DividerItemDecoration;
-
 import java.util.Vector;
 
 import static android.view.View.VISIBLE;
@@ -29,7 +23,7 @@ public class WorkoutAdapter extends BaseAdapter{
     private Vector<MainActivity.Training> trainings;
     private Context c;
     private DbHelper dbHelper;
-    private MainActivity mainActivity;
+    private ArrayListFragment listFragment;
 
     static class ViewHolder{
         ListView lV;
@@ -40,12 +34,12 @@ public class WorkoutAdapter extends BaseAdapter{
         View divider;
     }
 
-    public WorkoutAdapter(Context c, Vector<MainActivity.Training> trainings, MainActivity mainActivity){
+    public WorkoutAdapter(Context c, Vector<MainActivity.Training> trainings, ArrayListFragment listFragment){
         this.trainings = trainings;
         this.c = c;
         this.inflater = (LayoutInflater) c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         dbHelper = MainActivity.dbHelper;
-        this.mainActivity = mainActivity;
+        this.listFragment = listFragment;
     }
 
     @Override
@@ -93,16 +87,17 @@ public class WorkoutAdapter extends BaseAdapter{
 
         WorkoutSetAdapter workoutSetAdapter = new WorkoutSetAdapter(c, trainings.elementAt(i).reps, trainings.elementAt(i).kgs);
         holder.lV.setAdapter(workoutSetAdapter);
+
         holder.dIv.setOnClickListener(view1 -> {
             dbHelper.deleteByDateAndExercise(trainings.elementAt(i).exercise);
-            mainActivity.checkWorkout();
+            listFragment.updatePage();
         });
 
         holder.chIv.setOnClickListener(view1 -> {
             Intent showChartIntent = new Intent(c, GraphsActivity.class);
             showChartIntent.putExtra("exercise", trainings.elementAt(i).exercise);
             c.startActivity(showChartIntent);
-            mainActivity.checkWorkout();
+            listFragment.updatePage();
         });
 
         ConstraintLayout.LayoutParams mParam = new ConstraintLayout.LayoutParams(-1, (int)(holder.exTv.getTextSize()*1.9) + (int)(holder.exTv.getTextSize() *(1.63* trainings.elementAt(i).reps.size())));
@@ -119,9 +114,9 @@ public class WorkoutAdapter extends BaseAdapter{
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private boolean showDelete(View v, int i){
         v.findViewById(R.id.deleteImageView).setVisibility(VISIBLE);
-        v.findViewById(R.id.deleteImageView).startAnimation(mainActivity.slideLeftIn);
+        v.findViewById(R.id.deleteImageView).startAnimation(MainActivity.slideLeftIn);
         v.findViewById(R.id.exerciseChartImageView).setVisibility(VISIBLE);
-        v.findViewById(R.id.exerciseChartImageView).startAnimation(mainActivity.slideLeftIn);
+        v.findViewById(R.id.exerciseChartImageView).startAnimation(MainActivity.slideLeftIn);
         v.findViewById(R.id.clickView).setOnClickListener(view -> hideDelete(v, i));
         v.setBackgroundColor(Color.parseColor("#696360"));
         return true;
